@@ -163,3 +163,5 @@ cython_debug/
 .flaskenv
 *.txt
 test.py
+*.sql
+stuff

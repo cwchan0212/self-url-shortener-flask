@@ -1,1 +1,0 @@
-ALTER SEQUENCE visitor_visitor_id_seq RESTART with 1;
