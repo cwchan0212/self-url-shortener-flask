@@ -53,7 +53,7 @@ def random_ip_april():
 	count = 1
 	visit_range_start = datetime(2022, 10, 1, 0, 0, 0)
 	visit_range_end = datetime(2023, 1, 31, 23, 59, 59)
-	limit = 1000
+	limit = 100
 	print(f"\nThe total number of clicks is {limit}.")
 	while count <= limit:
 		visitor_datetime = visit_range_start + timedelta(seconds=random.randint(0, int((visit_range_end - visit_range_start).total_seconds())))
@@ -78,7 +78,7 @@ def random_ip_april():
 			# user_agent = parse(fake_user_agent)
 			user_agent_dictionary = visitor_views.get_user_agent_dictionary(fake_user_agent)
 			visitor_dictionary = {**ip_dictionary, **user_agent_dictionary}
-			random_loop = random.randrange(1, 5)
+			random_loop = random.randrange(1, 10)
 			print(f"\nNew IP {fake_ip} will attempt [{random_loop}] click(s).")				
 			for index in range(random_loop):
 				url = URL.random_url()

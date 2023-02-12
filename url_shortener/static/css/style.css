@@ -1,7 +1,22 @@
-th, td {
-    font-size: 0.8rem;
+* {
+    font-size: 0.9rem;
 }
 
 .nwdrag.drag {
     color: red;
 }
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 200px;
+    background-color: lightgray;
+  }
+  .main-content {
+    margin-top: 20px;
+    margin-left: 250px;
+  }
+
+

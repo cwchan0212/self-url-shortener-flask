@@ -1,10 +1,12 @@
-
-from sqlalchemy import Column, String, DateTime, Boolean, Text, JSON, asc, desc, exists, text, inspect, func
+import pandas as pd
+from sqlalchemy import Column, String, DateTime, Boolean, Text, JSON, asc, desc, exists, text, inspect, func, create_engine
 from flask_sqlalchemy import SQLAlchemy
 from url_shortener import app
 from random import shuffle
 
 db = SQLAlchemy(app)
+
+engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
 class URL(db.Model):
 	url_id = db.Column(db.Integer, primary_key=True)
@@ -121,6 +123,7 @@ class Visitor(db.Model):
 			db.session.rollback()
 		return count
 
+	# Sorting (desc) for pie chart
 	def get_visitor_count_by_country_and_url(short_url, sorting=False):
 		if sorting:
 			visitor = db.session.query(
@@ -136,6 +139,20 @@ class Visitor(db.Model):
 			).join(URL, URL.url_id == Visitor.url_id).filter(URL.url_short_url == short_url).group_by(Visitor.visitor_country, URL.url_long_url).all()
 
 		return visitor
+
+	def get_url_visitor_df():
+		df = None
+		try:
+			query = db.session.query(URL, Visitor)\
+							.join(URL, Visitor.url_id == URL.url_id)
+			# query = db.session.query(Visitor.visitor_ip, Visitor.visitor_country, URL.url_short_url, Visitor.visitor_visited_date)\
+			# 				.join(URL, Visitor.url_id == URL.url_id)\
+			# 				.group_by(Visitor.visitor_ip, Visitor.visitor_country, URL.url_short_url, Visitor.visitor_visited_date)
+			# print(query.statement)
+			df = pd.read_sql(query.statement, engine.connect())
+		except Exception as e:
+			print(e)
+		return df
 
 	# visitor_counts = db.session.query(Visitor.visitor_country, func.count(Visitor.visitor_country)).group_by(Visitor.visitor_country).all()
 

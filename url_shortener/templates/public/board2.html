@@ -1,0 +1,18 @@
+{% extends "public/base.html" %} {% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js" integrity="sha512-V0j9LhrK9IMNdFYZqh+IqU4cjo7wdxyHNyH+L0td4HryBuZ7Oq6QxP2/CWr6TituX31+gv5PnolvERuTbz8UNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock %} 
+
+
+{% block content %}
+<div class="container" style="width:75%">
+  {% for div in divs %}
+  <div class="row">
+    {% for d in div %}
+       <div class="col border border-primary rounded mx-2 my-2" style="width:{{ 100 / div | length }}%; display: flex; justify-content: center; align-items: center;">
+           {{ plot[d].plot | safe }} {{ plot[d].width }}
+        </div>
+    {%  endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %} {% block footer%} {% endblock %}

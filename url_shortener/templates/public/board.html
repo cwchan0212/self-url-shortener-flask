@@ -1,0 +1,78 @@
+{% extends "public/base.html" %} 
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js" integrity="sha512-V0j9LhrK9IMNdFYZqh+IqU4cjo7wdxyHNyH+L0td4HryBuZ7Oq6QxP2/CWr6TituX31+gv5PnolvERuTbz8UNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-sm-2">
+    <div class="col-sm-12 px-3 py-4 d-flex justify-content-between">
+      <div>{{ data["visitor_count"] }} Visits</div>
+      <div><i class="fa-regular fa-user fa-2xl"></i></div>
+    </div>
+    <div class="col-sm-12 px-3 py-4 d-flex justify-content-between">
+      <div>{{ data["visitor_duration_seconds"] }} sec <br>Avg Session Time</div>
+      <div style="margin-top:auto; margin-bottom:auto"><i class="fa-regular fa-clock fa-2xl"></i></div>
+       
+    
+    </div>
+    <div class="col-sm-12 px-3 py-4 d-flex justify-content-between">
+      <div>{{ data["visitor_average_page_view"] }} pages <br>Per Visit</div>
+      <div style="margin-top:auto; margin-bottom:auto"><i class="fa-regular fa-eye fa-2xl"></i></div>
+
+    </div>
+    <div class="col-sm-12 px-3 py-4 d-flex justify-content-between">
+      <div>{{ data["bounce_rate"] }}<br />Bounce Rate</div>
+      <div style="margin-top:auto; margin-bottom:auto"><i class="fa-solid fa-forward-fast fa-2xl"></i></div>
+       
+    </div>
+    <div class="col-sm-12 px-3 py-4 d-flex justify-content-between">
+      <div>{{ data["total_pages_view"] }} <br />Page Views</div>
+      <div style="margin-top:auto; margin-bottom:auto"><i class="fa-regular fa-file-lines fa-2xl"></i></div>
+      
+    </div>
+    <div class="col-sm-12 px-0 py-0">{{ plot | safe }}</div>
+  </div>
+
+  <div class="col-sm-10">
+    <div class="row">
+      <div class="col-sm-6">
+        <!-- Column chart 1 -->
+        {{ plot2 | safe }}
+      </div>
+      <div class="col-sm-6">
+        <!-- Column chart 2 -->
+        {{plot3 | safe }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <!-- Column chart 3 -->
+        {{plot4 | safe }}
+      </div>
+      <div class="col-sm-6">
+        <!-- Column chart 4 -->
+        {{ plot6 | safe }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-4">
+        <!-- Column chart 5 -->
+        {{ plot8 | safe }}
+      </div>
+      <div class="col-sm-4">
+        <!-- Column chart 6 -->
+
+        {{ plot7 | safe }}
+      </div>
+      <div class="col-sm-4">
+        <!-- Column chart 7 -->
+        {{ plot5 | safe }}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block footer%} {% endblock %}
