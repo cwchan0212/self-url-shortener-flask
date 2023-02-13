@@ -2,17 +2,47 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js" integrity="sha512-V0j9LhrK9IMNdFYZqh+IqU4cjo7wdxyHNyH+L0td4HryBuZ7Oq6QxP2/CWr6TituX31+gv5PnolvERuTbz8UNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 {% endblock %} 
 
-
 {% block content %}
-<div class="container" style="width:75%">
-  {% for div in divs %}
-  <div class="row">
-    {% for d in div %}
-       <div class="col border border-primary rounded mx-2 my-2" style="width:{{ 100 / div | length }}%; display: flex; justify-content: center; align-items: center;">
-           {{ plot[d].plot | safe }} {{ plot[d].width }}
-        </div>
-    {%  endfor %}
-  </div>
-  {% endfor %}
-</div>
-{% endblock %} {% block footer%} {% endblock %}
+          
+
+            <div class="text-center">
+              <h2>Overview of Short URL</h2>
+              <hr noshade />
+            </div>
+
+            {% for div in divs %}
+            <div class="row d-flex text-center">
+
+              {% if loop.index == 1 %}
+                <div class="col-2">
+                  {% for k, v in figure.items() %}
+                  <div id="figure-box" class="col border border-primary rounded px-2 py-2">
+                    {{ v | safe}}
+                  </div>
+                  {% endfor %}
+                </div> 
+              {% elif loop.index == 2 %}
+                <div class="col-2">
+                  {{ special_plot["visitor_new_return"]["plot"] | safe }}
+                </div> 
+              {% else %}
+                <div class="col-2">
+                  &nbsp;
+                </div>
+              {% endif %}
+
+                <div class="col">
+                  {% for d in div %}
+                    <div class="border border-primary rounded px-2 py-2" style="width:{{ 100 / div | length }}%; display: flex; justify-content: space-between; align-items: center%">
+                      {{ plot[d].plot | safe }}
+                    </div>
+                  {% endfor %}
+                </div>
+
+            </div> 
+            {% endfor %}
+
+{% endblock %} 
+
+{% block footer%} 
+{% endblock %}

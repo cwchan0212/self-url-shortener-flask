@@ -1,12 +1,6 @@
-import requests
-import secrets
-import random
-import json
-import time
+import requests, secrets, time
 import plotly.express as px
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 from url_shortener import app
 from datetime import datetime
@@ -42,43 +36,75 @@ def categorize_browser(browser):
 
 # ---------------------------------------------------------------------------------------------------------------------
 
+def create_special_bar(df_data, fig_title, fig_x, fig_y, fig_width, fig_height):
+
+	fig = px.bar(df_data, x=fig_x, y=fig_y, color=fig_x)
+	for trace in fig.data:
+		trace.showlegend = False
+
+	fig.update_layout(
+		title=fig_title, 
+		width=fig_width, height=fig_height,
+		yaxis_title="",
+		xaxis_title="",
+		margin=dict(l=20, r=20, t=50, b=0),
+		xaxis_showgrid=False,
+		yaxis_showgrid=False,
+		plot_bgcolor='rgba(0,0,0,0)',
+		paper_bgcolor='rgba(0,0,0,0)',
+
+	)
+
+	fig.update_yaxes(showticklabels=False)
+
+	for bar in fig.data:
+		bar.text = bar.y
+		bar.textposition = "auto"
+		bar.hovertemplate = '%{text}'
+
+	return {
+		"plot": fig.to_html(full_html=False) if fig else "",
+		"width": fig_width,
+	}
+
+# ---------------------------------------------------------------------------------------------------------------------
 
 def create_small_line(df_data, fig_title, fig_width, fig_x, fig_y, shade=None):
-    fig = None
-    if shade:
-        fig = px.area(df_data, x=fig_x, y=fig_y, text=fig_y)
-    else:
-        fig = px.line(df_data, x=fig_x, y=fig_y, text=fig_y)
+	fig = None
+	if shade:
+		fig = px.area(df_data, x=fig_x, y=fig_y, text=fig_y)
+	else:
+		fig = px.line(df_data, x=fig_x, y=fig_y, text=fig_y)
 
-    annotations = []
-    for i in range(len(df_data)):
-        annotations.append(dict(x=df_data[fig_y][i],
-                                y=df_data[fig_x][i],
-                                text=str(df_data[fig_y][i]),
-                                xanchor='center',
-                                yanchor='top',
-                                showarrow=False))
+	annotations = []
+	for i in range(len(df_data)):
+		annotations.append(dict(x=df_data[fig_y][i],
+								y=df_data[fig_x][i],
+								text=str(df_data[fig_y][i]),
+								xanchor='center',
+								yanchor='top',
+								showarrow=False))
 
-    fig.update_traces(textposition="top center")
-    fig.update_layout(
-        title=fig_title,
-        yaxis_title="",
-        xaxis_title="",
-        width=fig_width,
-        height=fig_width,
-        xaxis_showticklabels=False,
-        yaxis_showticklabels=False,
-        margin=dict(l=10, r=10, t=50, b=10),
-        xaxis_showgrid=False,
-        yaxis_showgrid=False,
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-    )
+	fig.update_traces(textposition="top center")
+	fig.update_layout(
+		title=fig_title,
+		yaxis_title="",
+		xaxis_title="",
+		width=fig_width,
+		height=fig_width,
+		xaxis_showticklabels=False,
+		yaxis_showticklabels=False,
+		margin=dict(l=10, r=10, t=50, b=10),
+		xaxis_showgrid=False,
+		yaxis_showgrid=False,
+		plot_bgcolor='rgba(0,0,0,0)',
+		paper_bgcolor='rgba(0,0,0,0)',
+	)
 
-    return {
-        "plot": fig.to_html(full_html=False) if fig else "",
-        "width": fig_width,
-    }
+	return {
+		"plot": fig.to_html(full_html=False) if fig else "",
+		"width": fig_width,
+	}
 
 # ---------------------------------------------------------------------------------------------------------------------
 
@@ -110,36 +136,81 @@ def create_small_pie(df_data, fig_title, fig_values, fig_width):
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-def create_small_chart(df_data, fig_title, fig_width, fig_height=None, fig_inside_label=None):
+# def create_small_chart(df_data, fig_title, fig_width, fig_height=None, fig_inside_label=None):
+# 	fig = px.bar(
+# 		df_data,
+# 		x=df_data.values,
+# 		y=df_data.index,
+# 		color=df_data.index,
+# 		orientation='h',
+# 	)
+# 	annotations = []
+# 	inside_label = None
+
+# 	for i in range(len(df_data)):
+# 		if fig_inside_label:
+# 			inside_label = f'{df_data.index[i]} - <b>{df_data.values[i]}</b>'
+# 		else:
+# 			inside_label = str(df_data.values[i])
+# 		annotations.append(dict(
+# 								x=df_data.values[i] / 2,
+# 								y=df_data.index[i],
+# 								# text=str(df_data.values[i]),
+# 								# text=str(df_data.index[i]),
+# 								text=inside_label,
+# 								xanchor='auto',
+# 								yanchor='middle',
+# 								showarrow=False))
+
+# 	fig.update_layout(
+# 		title=fig_title, 
+# 		width=fig_width, 
+# 		height=fig_height if fig_height else fig_width,
+# 		yaxis_title="",
+# 		xaxis_title="",
+# 		margin=dict(l=10, r=50, t=50, b=0),
+# 		paper_bgcolor='rgba(0,0,0,0)',
+# 		plot_bgcolor='rgba(0,0,0,0)',
+# 		yaxis_showticklabels=False if fig_inside_label else True,
+# 		xaxis_showticklabels=False,
+# 		showlegend=False,
+# 		annotations=annotations,
+# 	)
+
+# 	return {
+# 		"plot": fig.to_html(full_html=False) if fig else "",
+# 		"width": fig_width,
+# 	}
+
+
+# ---------------------------------------------------------------------------------------------------
+
+def create_small_bar(df_data, fig_title, fig_width, fig_height=None, fig_orientation="h", fig_inside_label=False):
+
 	fig = px.bar(
 		df_data,
-		x=df_data.values,
-		y=df_data.index,
+		x=df_data.values if fig_orientation == "h" else df_data.index,
+		y=df_data.index if fig_orientation == "h" else df_data.values,
 		color=df_data.index,
-		orientation='h',
+		orientation=fig_orientation,
 	)
 	annotations = []
 	inside_label = None
 
 	for i in range(len(df_data)):
 		if fig_inside_label:
-			inside_label = f'{df_data.index[i]} - <b>{df_data.values[i]}</b>'
+			inside_label = f'{df_data.index[i]} - {df_data.values[i]}'
 		else:
 			inside_label = str(df_data.values[i])
-		annotations.append(dict(x=df_data.values[i] / 2,
-								y=df_data.index[i],
+		annotations.append(dict(
+								x=df_data.values[i] / 2 if fig_orientation == "h" else df_data.index[i] ,
+								y=df_data.index[i] if fig_orientation == "h" else df_data.values[i] / 2,
 								# text=str(df_data.values[i]),
 								# text=str(df_data.index[i]),
 								text=inside_label,
 								xanchor='auto',
 								yanchor='middle',
 								showarrow=False))
-
-	# for i in range(len(df_data)):
-	# 	annotations.append(
-	# 		dict(y=df_data.index[i], x=df_data.values[i], text=str(df_data.values[i]), showarrow=False))
-	# fig_width = 300
-
 
 	fig.update_layout(
 		title=fig_title, 
@@ -150,24 +221,16 @@ def create_small_chart(df_data, fig_title, fig_width, fig_height=None, fig_insid
 		margin=dict(l=10, r=50, t=50, b=0),
 		paper_bgcolor='rgba(0,0,0,0)',
 		plot_bgcolor='rgba(0,0,0,0)',
-		yaxis_showticklabels=False if fig_inside_label else True,
+		yaxis_showticklabels=False,
 		xaxis_showticklabels=False,
 		showlegend=False,
 		annotations=annotations,
 	)
-	
-	# fig.update_yaxes (
-	# 	tickmode="array",
-	# 	ticklabelposition="inside",
-	# )
 
 	return {
 		"plot": fig.to_html(full_html=False) if fig else "",
 		"width": fig_width,
 	}
-
-
-
 
 
 
@@ -277,12 +340,22 @@ def visitor_pie(short_url):
 
 #=====================================================================================
 
+def figure_lines(figure, suffix_first=None, suffix_second=None, font_icon=None):
+	line_break = "<br>" if suffix_second else ""
+	second_div_class = "style='margin-top:auto; margin-bottom:auto'" if suffix_second else ""
+	figure_html = f"<div><span class='figure'>{figure}</span> <span class='unit'>{suffix_first}</span> {line_break} <span class='unit2'>{ suffix_second }</span></div>\n"
+	figure_html += f"<div {second_div_class}><i class='{font_icon} fa-2xl'></i></div>"
+	#   <div>{{ data["visitor_average_page_view"] }} pages <br>Per Visit</div>
+	#   <div style="margin-top:auto; margin-bottom:auto"><i class="fa-regular fa-eye fa-2xl"></i></div>
+
+	#   <div>{{ data["visitor_duration_seconds"] }} sec <br>Avg Session Time</div>
+	#   <div style="margin-top:auto; margin-bottom:auto"><i class="fa-regular fa-clock fa-2xl"></i></div>
+	return figure_html
 # ---------------------------------------------------------------------------------------------------------------------
-@app.route("/dash/<int:number>")
-def dashboard_index(number):
+@app.route("/dashboard")
+def dashboard_index():
 	
 	df = pd.read_csv("url_visitor.csv")
-	number = int(number)
 	visitor_return_width = 0
 	machine_width = 0
 	os_width = 0
@@ -290,7 +363,7 @@ def dashboard_index(number):
 	row_width_first = 400
 	row_width_second = 400
 	row_width_third = 250
-
+	row_orientation_third = "v"
 
 	week_count_plot = None
 	bounce_count_plot = None
@@ -298,6 +371,49 @@ def dashboard_index(number):
 	machine_plot, os_plot, browser_plot = None, None, None
 
 	visitor_new_return_fig, machine_fig, os_fig, browser_fig = None, None, None, None
+
+# ------------------------------------------------------------------------------------------------------------
+# 1 - 5 Figures:
+	# 1. No of visitors (group visitors visit on the same date), regardless their countries,
+	country_cols = ["visitor_country", "visitor_ip", "url_short_url"]
+	country = df.groupby(country_cols)
+	visitor_count = f"{len(country['visitor_id'].count()):,}"
+
+	# 2. Average time they stay in the page
+	df['visitor_visited_date'] = pd.to_datetime(df['visitor_visited_date'])
+	# -----------------------------------
+	# No of visitors visits more than one -> Average Session Time
+	# Filter visitors who visit only once per day
+	df_filtered = df.groupby(['visitor_ip', df['visitor_visited_date'].dt.date]).filter(lambda x: len(x) > 1)
+	# Calculate the difference between max and min visitor_visited_date
+	df_filtered['visit_duration'] = df_filtered.groupby(['visitor_ip', df_filtered['visitor_visited_date'].dt.date])['visitor_visited_date'].transform('max') - df_filtered.groupby(['visitor_ip', df_filtered['visitor_visited_date'].dt.date])['visitor_visited_date'].transform('min')
+	visitor_duration = df_filtered['visit_duration'].mean()
+	visitor_duration_seconds = convert_to_seconds(visitor_duration)
+
+	# 3. No. of page views per visitor on average
+	# Average Page View
+	df_ip = df.groupby(["visitor_ip", "url_id"])
+	visitor_average_page_view = round(df_ip["visitor_ip"].count().mean(), 2)
+
+	# 4. bounce rate (overall) of this month
+	visitor_ip_all = df.groupby(["visitor_ip"])
+	visitor_ip_once = visitor_ip_all.filter(lambda x: len(x) == 1)
+	bounce_rate_one = round(visitor_ip_once.shape[0] / len(visitor_ip_all["visitor_ip"]) * 100, 2)
+
+	# 5. total number of pages views
+	total_pages_view = f"{df['visitor_ip'].count():,}"
+
+
+	figures = {
+		"visitor_count": f"{figure_lines(visitor_count, '', 'Visits', 'fa-regular fa-user')}",
+		"visitor_duration_seconds": f"{figure_lines(visitor_duration_seconds, 'sec', 'Avg Session Time', 'fa-regular fa-clock')}",
+		"visitor_average_page_view": f"{figure_lines(visitor_average_page_view, 'pages', 'Per Visit', 'fa-regular fa-eye')}",
+		"bounce_rate": f"{figure_lines(bounce_rate_one, '', 'Bounce Rate', 'fa-solid fa-forward-fast')}",
+		"total_pages_view": f"{figure_lines(total_pages_view, '', 'Page Views', 'fa-regular fa-file-lines')}",
+
+	}
+
+
 
 # 6 New return 
 
@@ -309,30 +425,38 @@ def dashboard_index(number):
 		"visitor_type": ["New", "Return"],
 		"count": visitor_new_return,
 	})
+	# def create_special_bar(df_data, fig_title, fig_x, fig_y, fig_width, fig_height):
+	visitor_new_return_title = "Visitors by User Type"
+	visitor_new_return_x = "visitor_type"
+	visitor_new_return_y = "count"
+	visitor_new_return_width = 220
+	visitor_new_return_height = 200
+	visitor_new_return_plot = create_special_bar(df_visitor_new_return, visitor_new_return_title, visitor_new_return_x, visitor_new_return_y, visitor_new_return_width, visitor_new_return_height)
 
-	visitor_new_return_fig = px.bar(df_visitor_new_return, x="visitor_type", y="count", color="visitor_type")
-	for trace in visitor_new_return_fig.data:
-		trace.showlegend = False
-	visitor_return_width = 250
-	visitor_new_return_fig.update_layout(
-		title='Visitors by User Type', 
-		width=visitor_return_width, height=200,
-		yaxis_title="",
-		xaxis_title="",
-		margin=dict(l=50, r=0, t=50, b=0),
-		xaxis_showgrid=False,
-		yaxis_showgrid=False,
-		plot_bgcolor='rgba(0,0,0,0)',
-		paper_bgcolor='rgba(0,0,0,0)',
+	# visitor_new_return_fig = px.bar(df_visitor_new_return, x="visitor_type", y="count", color="visitor_type")
+	# for trace in visitor_new_return_fig.data:
+	# 	trace.showlegend = False
 
-	)
+	# visitor_return_width = 250
+	# visitor_new_return_fig.update_layout(
+	# 	title='Visitors by User Type', 
+	# 	width=visitor_return_width, height=200,
+	# 	yaxis_title="",
+	# 	xaxis_title="",
+	# 	margin=dict(l=50, r=0, t=50, b=0),
+	# 	xaxis_showgrid=False,
+	# 	yaxis_showgrid=False,
+	# 	plot_bgcolor='rgba(0,0,0,0)',
+	# 	paper_bgcolor='rgba(0,0,0,0)',
 
-	visitor_new_return_fig.update_yaxes(showticklabels=False)
+	# )
 
-	for bar in visitor_new_return_fig.data:
-		bar.text = bar.y
-		bar.textposition = "auto"
-		bar.hovertemplate = '%{text}'
+	# visitor_new_return_fig.update_yaxes(showticklabels=False)
+
+	# for bar in visitor_new_return_fig.data:
+	# 	bar.text = bar.y
+	# 	bar.textposition = "auto"
+	# 	bar.hovertemplate = '%{text}'
 
 
 	# 1st Rows: Week Vist / Bounce
@@ -408,7 +532,7 @@ def dashboard_index(number):
 	short_url_group = df.groupby(["url_title"])
 	short_url_data = short_url_group.count()["url_id"].head().sort_values(ascending=False)	
 	short_url_data_top3 = short_url_data[:3]
-	short_url_plot = create_small_chart(short_url_data_top3, short_url_title, short_url_width, short_url_height, True)
+	short_url_plot = create_small_bar(short_url_data_top3, short_url_title, short_url_width, fig_height=short_url_width, fig_orientation="h", fig_inside_label=True)
 
 # ---------------------------------------------------------------------------------------------------------------------
 	# 11. Machine
@@ -424,7 +548,7 @@ def dashboard_index(number):
 
 	machine_group = df.groupby(["visitor_machine"])
 	machine_data = machine_group.count()["visitor_ip"].sort_values(ascending=False)		
-	machine_plot = create_small_chart(machine_data, machine_title, machine_width)
+	machine_plot = create_small_bar(machine_data, machine_title, machine_width, fig_orientation=row_orientation_third)
 
 
 	# 12. OS
@@ -442,7 +566,7 @@ def dashboard_index(number):
 	df["os_category"] = df["visitor_os"].apply(lambda x: categorize_os(x))
 	os_group = df.groupby(["os_category"])
 	os_data = os_group["visitor_os"].count().sort_values(ascending=False).head()
-	os_plot = create_small_chart(os_data, os_title, os_width)
+	os_plot = create_small_bar(os_data, os_title, os_width, fig_orientation=row_orientation_third)
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -461,7 +585,8 @@ def dashboard_index(number):
 	df["browser_category"] = df["visitor_browser"].apply(lambda x: categorize_browser(x))
 	browser_group = df.groupby(["browser_category"])
 	browser_data = browser_group["visitor_browser"].count().sort_values(ascending=False).head()
-	browser_plot = create_small_chart(browser_data, browser_title, browser_width)
+	browser_plot = create_small_bar(browser_data, browser_title, browser_width, fig_orientation=row_orientation_third)
+
 
 	plots = {
 		"week_count": week_count_plot,
@@ -472,10 +597,14 @@ def dashboard_index(number):
 		"os": os_plot,		
 		"browser": browser_plot,
 	}
+
+	special_plots = {
+		"visitor_new_return": visitor_new_return_plot,
+	}
 	
 	div_list  = [ ["week_count", "bounce_count"], ["country", "short_url"], ["machine", "os", "browser"]]
 
-	return render_template("/public/board2.html", plot=plots, divs=div_list)
+	return render_template("/public/board2.html", plot=plots, special_plot=special_plots, figure=figures, divs=div_list)
 
 
 
@@ -757,9 +886,9 @@ def dashboard():
 	week_count_fig.update_traces(textposition="top center")
 	week_count_fig.update_layout(
 		title="Visit by Week of Year",
-        yaxis_title="",
-        xaxis_title="",
-	    width=400, 
+		yaxis_title="",
+		xaxis_title="",
+		width=400, 
 		height=300,
 		# xaxis=dict(
 		# 	tickvals=list(range(len(week_count_data))),
@@ -772,7 +901,7 @@ def dashboard():
 		# ),
 		xaxis_showticklabels=False,
 		yaxis_showticklabels=False,
-        margin=dict(l=10, r=10, t=50, b=10),
+		margin=dict(l=10, r=10, t=50, b=10),
 
 		# shapes=[dict(
 		# 	type='rect',
@@ -868,7 +997,6 @@ def dashboard():
 		"count": visitor_new_return,
 	})
 
-	# visitor_new_return_fig = px.bar(df_visitor_new_return, x="visitor_type", y="count", color="visitor_type", width=200, height=200)
 	visitor_new_return_fig = px.bar(df_visitor_new_return, x="visitor_type", y="count", color="visitor_type", width=200, height=200)
 
 	for trace in visitor_new_return_fig.data:
