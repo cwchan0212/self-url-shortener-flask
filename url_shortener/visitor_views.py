@@ -47,7 +47,7 @@ def create_special_bar(df_data, fig_title, fig_x, fig_y, fig_width, fig_height):
 		width=fig_width, height=fig_height,
 		yaxis_title="",
 		xaxis_title="",
-		margin=dict(l=20, r=20, t=50, b=0),
+		margin=dict(l=10, r=10, t=50, b=0),
 		xaxis_showgrid=False,
 		yaxis_showgrid=False,
 		plot_bgcolor='rgba(0,0,0,0)',
@@ -134,55 +134,6 @@ def create_small_pie(df_data, fig_title, fig_values, fig_width):
 	}
 
 
-# ---------------------------------------------------------------------------------------------------------------------
-
-# def create_small_chart(df_data, fig_title, fig_width, fig_height=None, fig_inside_label=None):
-# 	fig = px.bar(
-# 		df_data,
-# 		x=df_data.values,
-# 		y=df_data.index,
-# 		color=df_data.index,
-# 		orientation='h',
-# 	)
-# 	annotations = []
-# 	inside_label = None
-
-# 	for i in range(len(df_data)):
-# 		if fig_inside_label:
-# 			inside_label = f'{df_data.index[i]} - <b>{df_data.values[i]}</b>'
-# 		else:
-# 			inside_label = str(df_data.values[i])
-# 		annotations.append(dict(
-# 								x=df_data.values[i] / 2,
-# 								y=df_data.index[i],
-# 								# text=str(df_data.values[i]),
-# 								# text=str(df_data.index[i]),
-# 								text=inside_label,
-# 								xanchor='auto',
-# 								yanchor='middle',
-# 								showarrow=False))
-
-# 	fig.update_layout(
-# 		title=fig_title, 
-# 		width=fig_width, 
-# 		height=fig_height if fig_height else fig_width,
-# 		yaxis_title="",
-# 		xaxis_title="",
-# 		margin=dict(l=10, r=50, t=50, b=0),
-# 		paper_bgcolor='rgba(0,0,0,0)',
-# 		plot_bgcolor='rgba(0,0,0,0)',
-# 		yaxis_showticklabels=False if fig_inside_label else True,
-# 		xaxis_showticklabels=False,
-# 		showlegend=False,
-# 		annotations=annotations,
-# 	)
-
-# 	return {
-# 		"plot": fig.to_html(full_html=False) if fig else "",
-# 		"width": fig_width,
-# 	}
-
-
 # ---------------------------------------------------------------------------------------------------
 
 def create_small_bar(df_data, fig_title, fig_width, fig_height=None, fig_orientation="h", fig_inside_label=False):
@@ -194,6 +145,8 @@ def create_small_bar(df_data, fig_title, fig_width, fig_height=None, fig_orienta
 		color=df_data.index,
 		orientation=fig_orientation,
 	)
+
+
 	annotations = []
 	inside_label = None
 
@@ -205,8 +158,6 @@ def create_small_bar(df_data, fig_title, fig_width, fig_height=None, fig_orienta
 		annotations.append(dict(
 								x=df_data.values[i] / 2 if fig_orientation == "h" else df_data.index[i] ,
 								y=df_data.index[i] if fig_orientation == "h" else df_data.values[i] / 2,
-								# text=str(df_data.values[i]),
-								# text=str(df_data.index[i]),
 								text=inside_label,
 								xanchor='auto',
 								yanchor='middle',
@@ -218,11 +169,11 @@ def create_small_bar(df_data, fig_title, fig_width, fig_height=None, fig_orienta
 		height=fig_height if fig_height else fig_width,
 		yaxis_title="",
 		xaxis_title="",
-		margin=dict(l=10, r=50, t=50, b=0),
+		margin=dict(l=10, r=10, t=50, b=10),
 		paper_bgcolor='rgba(0,0,0,0)',
 		plot_bgcolor='rgba(0,0,0,0)',
 		yaxis_showticklabels=False,
-		xaxis_showticklabels=False,
+		xaxis_showticklabels=True,
 		showlegend=False,
 		annotations=annotations,
 	)
@@ -344,7 +295,7 @@ def figure_lines(figure, suffix_first=None, suffix_second=None, font_icon=None):
 	line_break = "<br>" if suffix_second else ""
 	second_div_class = "style='margin-top:auto; margin-bottom:auto'" if suffix_second else ""
 	figure_html = f"<div><span class='figure'>{figure}</span> <span class='unit'>{suffix_first}</span> {line_break} <span class='unit2'>{ suffix_second }</span></div>\n"
-	figure_html += f"<div {second_div_class}><i class='{font_icon} fa-2xl'></i></div>"
+	figure_html += f"<div {second_div_class}><i id='figure-icon' class='{font_icon} fa-2xl'></i></div>"
 	#   <div>{{ data["visitor_average_page_view"] }} pages <br>Per Visit</div>
 	#   <div style="margin-top:auto; margin-bottom:auto"><i class="fa-regular fa-eye fa-2xl"></i></div>
 
@@ -604,7 +555,7 @@ def dashboard_index():
 	
 	div_list  = [ ["week_count", "bounce_count"], ["country", "short_url"], ["machine", "os", "browser"]]
 
-	return render_template("/public/board2.html", plot=plots, special_plot=special_plots, figure=figures, divs=div_list)
+	return render_template("/public/dashboard.html", plot=plots, special_plot=special_plots, figure=figures, divs=div_list)
 
 
 

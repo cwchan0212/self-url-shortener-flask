@@ -1,0 +1,48 @@
+{% extends "public/base.html" %} {% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js" integrity="sha512-V0j9LhrK9IMNdFYZqh+IqU4cjo7wdxyHNyH+L0td4HryBuZ7Oq6QxP2/CWr6TituX31+gv5PnolvERuTbz8UNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock %} 
+
+{% block content %}
+
+
+            <div class="text-center">
+              <h2 class="fw-bold mb-2">Overview</h2>
+              <hr noshade />
+            </div>
+
+            {% for div in divs %}
+              <div class="row">
+
+                {% if loop.index == 1 %}
+                  <div class="col" style="max-width: 240px;">
+                    {% for k, v in figure.items() %}
+                    <div id="figure-box" class="border border-primary rounded mx-2 my-2 px-2 py-2">
+                      {{ v | safe }}
+                    </div>
+                    {% endfor %}
+                  </div> 
+                {% elif loop.index == 2 %}
+                  <div class="col" style="max-width: 240px;">
+                    {{ special_plot["visitor_new_return"]["plot"] | safe }}
+                  </div> 
+                {% else %}
+                  <div class="col" style="max-width: 240px;">
+                    &nbsp;
+                  </div>
+                {% endif %}
+
+                <div class="col d-inline-flex">
+                  {% for d in div %}
+                    <div id="chart-box" class="border border-primary rounded mx-2 my-2" style="width:{{ (100 / div | length) | int }}%">
+                        {{ plot[d].plot | safe }} 
+                    </div>
+                  {% endfor %}
+                </div>
+
+              </div>
+              {% endfor %}
+
+{% endblock %} 
+
+{% block footer%} 
+{% endblock %}

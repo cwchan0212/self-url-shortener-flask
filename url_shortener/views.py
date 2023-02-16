@@ -6,8 +6,29 @@ from flask import Flask, render_template, request, redirect, make_response, json
 from user_agents import parse
 from .models import URL, Visitor
 
+# ---------------------------------------------------------------------------------------------------------------------
+# Statistics
+@app.route("/statistics")
+def statistics():
+	
+	short = secrets.token_hex(3)
+	urls  = URL.all_url_pages(1)
+	# urls = URL.all_url()
 
-@app.route("/")
+	return render_template("public/statistics.html", urls=urls, short=short)
+
+# ---------------------------------------------------------------------------------------------------------------------
+
+@app.route("/statistics/<int:current_page>")
+def statistics_page(current_page=None):
+	short = secrets.token_hex(3)
+	urls  = URL.all_url_pages(current_page)
+	return render_template("public/statistics.html", urls=urls, short=short)
+
+# ---------------------------------------------------------------------------------------------------------------------
+
+# main
+@app.route("/lists")
 def index():
 	# messages = f"Hello"
 	# flash(messages)
@@ -15,9 +36,15 @@ def index():
 	urls  = URL.all_url_pages(1)
 	# urls = URL.all_url()
 
-	return render_template("public/index.html", urls=urls, short=short)
+	return render_template("public/lists.html", urls=urls, short=short)
 
-
+# ---------------------------------------------------------------------------------------------------------------------
+@app.route("/lists/<int:current_page>")
+def page(current_page=None):
+	short = secrets.token_hex(3)
+	urls  = URL.all_url_pages(current_page)
+	return render_template("public/lists.html", urls=urls, short=short)
+# ---------------------------------------------------------------------------------------------------------------------
 @app.route("/shorten", methods=["POST"])
 def shorten():
 	short = secrets.token_hex(3)
@@ -78,11 +105,9 @@ def shorten():
 		pass
 		return redirect("/")
 	
-@app.route("/page/<int:current_page>")
-def page(current_page=None):
-	short = secrets.token_hex(3)
-	urls  = URL.all_url_pages(current_page)
-	return render_template("public/index.html", urls=urls, short=short)
+# ---------------------------------------------------------------------------------------------------------------------
+	
+
 
 @app.template_filter()
 def datetime(dt):
