@@ -44,6 +44,56 @@ def update_ip_list(ip_list, error_ip):
 
 # ---------------------------------------------------------------------------------------------------------------------
 # For ip-api only
+
+def random_ip_may():
+	user_agent_list = load_user_agent_file()
+	headers = {'Accept': 'application/json'	}
+	base_url = "http://ip-api.com/json/"
+	query=f"fields=status,message,country,regionName,city,lat,lon,isp,asname,query"
+	
+	ip_list = load_ip_file()
+	index = len(ip_list) - 1
+	while index > 0:
+		fake_ip = ip_list[index]
+		query_url = f"{base_url}{fake_ip}?{query}"
+		response = requests.get(query_url, headers=headers)
+		print(f"{query_url}")
+		if response.json()["status"] == "fail":
+			wait_time = random.randrange(10,15)					
+			description = f"Waiting:"
+			progress_bar(wait_time, description)
+			update_ip_list(ip_list, fake_ip)
+			ip_list = load_ip_file()
+		else:
+			print(f"#{index+1}/{len(ip_list)}: {fake_ip}")
+			print(f"{response.json()}")
+			wait_time = random.randrange(10,15)					
+			description = f"Waiting:"
+			progress_bar(wait_time, description)		
+		index -= 1
+
+	# for index in reversed(range(592)):
+	# # for index in reversed(range(len(ip_list))):
+	# 	fake_ip = ip_list[index]
+	# 	query_url = f"{base_url}{fake_ip}?{query}"
+	# 	response = requests.get(query_url, headers=headers)
+	# 	print(f"{query_url}")
+	# 	if response.json()["status"] == "fail":
+	# 		wait_time = random.randrange(10,15)					
+	# 		description = f"Waiting:"
+	# 		progress_bar(wait_time, description)
+	# 		update_ip_list(ip_list, fake_ip)
+	# 	else:
+	# 		print(f"#{index+1}/{len(ip_list)}: {fake_ip}")
+	# 		print(f"{response.json()}")
+	# 		wait_time = random.randrange(10,15)					
+	# 		description = f"Waiting:"
+	# 		progress_bar(wait_time, description)
+			
+	exit()
+
+# ---------------------------------------------------------------------------------------------------------------------
+# For ip-api only
 def random_ip_april():
 	user_agent_list = load_user_agent_file()
 	headers = {'Accept': 'application/json'	}
@@ -169,7 +219,8 @@ print(app.config["SQLALCHEMY_DATABASE_URI"])
 
 try:
 	with app.app_context():
-		random_ip_april()		
+		# random_ip_april()		
+		random_ip_may()
 
 		pass
 		# db.drop_all()

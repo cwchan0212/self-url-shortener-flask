@@ -1,0 +1,76 @@
+{% extends "public/base.html" %} 
+{% block content %}
+<div class="text-center">
+  <h2 class="fw-bold mb-2 py-1"><i class="fa-solid fa-circle-info"></i> Detail</h2>
+  <hr />
+</div>
+<div class="container" style="width: 80%">
+  <table>
+    <tr>
+      <td class="text-center">
+        <div>
+          <h4>{{ url_info["title"]}}</h4>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="d-flex justify-content-between px-2 py-2">
+        <div>
+          <a href="{{ referrer }}"><button class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-rotate-left"></i> Back</button></a>
+        </div>
+        <div>(Created on {{ url_info["created_date"] | date_string }})</div>
+        <div>Visits: {{ visitor_data["number_of_visitors"] }}</div>
+      </td>
+    </tr>
+  {% if "project" in url_info["title"] | lower %}
+    <tr>
+      <td class="text-center">
+        <iframe width="100%" height="500px" src="{{ url_info['long_url'] }}"></iframe>
+      </td>
+    </tr>
+    <tr>
+      <td class="text-center">
+        <a href="{{ url_info['long_url'] }}" target="_blank"><button class="btn btn-outline-primary btn-sm"><i class="fa-regular fa-window-maximize"></i> Full View</button></a>
+      </td>
+    </tr>
+  {% else %}
+    <tr>
+      <td class="text-center">
+        <img src="{{ url_for('static', filename='img/redirect.png') }}" height="400" style="border-radius: 10px" />
+      </td>
+    </tr>
+    <tr>
+      <td class="text-center">
+        <a href="{{ url_info['long_url'] }}" target="_blank"><button class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-arrow-rotate-right"></i> Redirect</button></a>
+      </td>
+    </tr>
+  {% endif %}
+    <tr>
+      <td><hr /></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="d-flex justify-content-around px-4 py-2">
+          <div>{{ url_info["description"] }}</div>
+          <div style="padding-left: 20px">{{ plots.visitor_new_return_plot.plot | safe }}</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="d-flex justify-content-around">
+          <div>{{ plots.country_plot.plot | safe }}</div>
+          <div>{{ plots.week_count_plot.plot | safe }}</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="d-flex justify-content-around">
+        <div>{{ plots.machine_plot.plot | safe }}</div>
+        <div>{{ plots.os_plot.plot | safe }}</div>
+        <div>{{ plots.browser_plot.plot | safe }}</div>
+      </td>
+    </tr>
+  </table>
+</div>
+{% endblock %}

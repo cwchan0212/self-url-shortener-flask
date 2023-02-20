@@ -33,7 +33,7 @@ class URL(db.Model):
 		return count
 	
 	def all_url_pages(current_page):
-		per_page = 10
+		per_page = 20
 		urls = db.session.query(URL).order_by(URL.url_id.desc()).paginate(page=current_page, per_page=per_page)
 		# items = db.session.query(Item).offset((page - 1) * page_size).limit(page_size).all()
 		# urls = db.session.paginate(db.session.filter.query(URL).order_by(URL.url_id.desc()).all(), page=current_page)
@@ -153,16 +153,3 @@ class Visitor(db.Model):
 		except Exception as e:
 			print(e)
 		return df
-
-	# visitor_counts = db.session.query(Visitor.visitor_country, func.count(Visitor.visitor_country)).group_by(Visitor.visitor_country).all()
-
-    # SELECT visitor_country, count(distinct visitor_ip) as unique_visitors
-	# FROM visitor
-	# GROUP BY visitor_country
-	# ORDER BY unique_visitors DESC;
-
-	# SELECT visitor_country, count(distinct visitor_ip) as unique_visitors
-	# FROM visitor
-	# WHERE url_id = <specific_url_id>
-	# GROUP BY visitor_country
-	# ORDER BY unique_visitors DESC;

@@ -1,69 +1,58 @@
-{% extends "public/base.html" %}
-
+{% extends "public/base.html" %} 
 {% block content %}
 <script>
-    function showBarChart(url_id) {
-        location.href="/links/bar/" + url_id;
-    }
-
-    function showPieChart(url_id) {
-        location.href="/links/pie/" + url_id;
-    }
-
+  function showBarChart(url_id) {
+    location.href = "/links/bar/" + url_id;
+  }
+  function showPieChart(url_id) {
+    location.href = "/links/pie/" + url_id;
+  }
 </script>
-
-
 <div class="container text-center">
-    <div>
-      <h2 class="fw-bold mb-2">URL shortener</h2>
-    </div>
-{% with messages = get_flashed_messages() %} 
-{% if messages %}
-    <div class="flashes text-center">
-  {% for message in messages %} 
-    {{ message }}<br />
-  {% endfor %}
-    </div>
-{% endif %}
-{% endwith %}
+  <div>
+    <h2 class="fw-bold mb-2">URL shortener</h2>
   </div>
-
-  
-  
-    {% if urls %}
-
-<div class="container">
-    <table class="table">
-        <thead>
-            <tr class="text-center">
-                <th>#</th>
-                <th>Short URL</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Created</th>
-                <th>Updated</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for url in urls %}
-            <tr>
-                <td>{{ url.url_id }}</td>
-                <td><a href="/links/{{ url.url_short_url }}">{{ url.url_short_url }}</a></td>
-                <td>{{ url.url_title }}</td>
-                <td>{{ url.url_description }}</td>
-                <td>{{ url.url_created_date }}</td>
-                <td>{{ url.url_updated_date }}</td>
-                <td class="text-center" style="width:10%">
-                    <button type="button" class="btn btn-outline-primary btn-sm" onClick="showBarChart('{{ url.url_short_url }}')"><i class="fa-solid fa-circle-info"></i></button>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onClick="showPieChart('{{ url.url_short_url }}')"><i class="fa-solid fa-chart-pie"></i></button>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-
-    </table>
-
+    {% with messages = get_flashed_messages() %} 
+        {% if messages %}
+  <div class="flashes text-center">
+            {% for message in messages %} 
+                {{ message }}<br />
+            {% endfor %}
+  </div>
+        {% endif %} 
+    {% endwith %}
 </div>
-    {% endif %}
+    {% if urls %}
+<div class="container">
+  <table class="table">
+    <thead>
+      <tr class="text-center">
+        <th>#</th>
+        <th>Short URL</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Created</th>
+        <th>Updated</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for url in urls %}
+      <tr>
+        <td>{{ url.url_id }}</td>
+        <td><a href="/links/{{ url.url_short_url }}">{{ url.url_short_url }}</a></td>
+        <td>{{ url.url_title }}</td>
+        <td>{{ url.url_description }}</td>
+        <td>{{ url.url_created_date }}</td>
+        <td>{{ url.url_updated_date }}</td>
+        <td class="text-center" style="width: 10%">
+          <button type="button" class="btn btn-outline-primary btn-sm" onClick="showBarChart('{{ url.url_short_url }}')"><i class="fa-solid fa-circle-info"></i></button>
+          <button type="button" class="btn btn-outline-primary btn-sm" onClick="showPieChart('{{ url.url_short_url }}')"><i class="fa-solid fa-chart-pie"></i></button>
+        </td>
+      </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+    {% endif %} 
 {% endblock %}

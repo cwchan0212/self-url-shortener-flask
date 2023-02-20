@@ -1,99 +1,67 @@
-{% extends "public/base.html" %}
-
+{% extends "public/base.html" %} 
 {% block content %}
-    <div class="text-center">
-      <div>
-        <h2 class="fw-bold mb-2">URL shortener</h2>
-      </div>
-{% with messages = get_flashed_messages() %} 
-  {% if messages %}
-      <div class="flashes text-center">
-    {% for message in messages %} 
-      {{ message }}<br />
-    {% endfor %}
-      </div>
-  {% endif %}
-{% endwith %}
-    </div>
-    <div class="container d-flex justify-content-end">
-      <ul class="pagination pagination-sm">
-{% if urls.has_prev %}
-        <li class="page-item"><a class="page-link" href="{{ url_for('statistics_page', current_page=urls.prev_num) }}">Previous</a> </li>
-{% else %}
-        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-{% endif %} 
-
-{% for page in urls.iter_pages() %} 
-  {% if page %} 
-    {% if urls.page == page %}
-        <li class="page-item active"><a class="page-link" href="#">{{ page }}</a></li>
-    {% else %}
-        <li class="page-item"><a class="page-link" href="{{ url_for('statistics_page', current_page=page) }}"> {{ page }} </a></li>
+<div class="text-center">
+  <div>
+    <h1 class="fw-bold mb-2 py-2"><i class="fa-solid fa-chart-simple"></i> Stat</h1>
+  </div>
+  <div>
+    <hr />
+  </div>
+</div>
+  {% with messages = get_flashed_messages() %} 
+    {% if messages %}
+<div class="flashes text-center">
+      {% for message in messages %} 
+        {{ message }}<br />
+      {% endfor %}
+</div>
     {% endif %} 
+  {% endwith %}
+<div class="container d-flex justify-content-end">
+  <ul class="pagination pagination-sm">
+  {% if current_page > 1 %}
+    <li class="page-item"><a class="page-link" href="{{ url_for('statistics_page', current_page=current_page - 1) }}">Previous</a></li>
   {% else %}
-        <li class="page-item">...</li>
+    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
   {% endif %} 
-{% endfor %} 
-
-{% if urls.has_next %}
-        <li class="page-item"><a class="page-link" href="{{ url_for('page', current_page=urls.next_num) }}">Next</a></li>
-{% else %}
-        <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
-{% endif %}
-      </ul>
-    </div>
-
-    <div class="container" style="width: 100%">
-      <table class="table text-center table-striped">
-        <thead>
-          <tr>
-            <th style="width: 5%">#</th>
-            <th style="width: 8%">Short URL</th>
-            <th style="width: 20%">Title URL</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th style="width: 10%">Created</th>
-            <th style="width: 10%">Updated</th>
-            <th style="width: 10%">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <form action="/shorten" method="post">
-            <tr>
-              <td><i class="fa-regular fa-square-plus"></i></td>
-              <td><input class="form-control form-control-sm" type="text" name="short_url" value="{{ short }}" readonly /></td>
-              <td><input class="form-control form-control-sm" type="text" name="long_url" maxlength="100" /></td>
-              <td><input class="form-control form-control-sm" type="text" name="title" maxlength="100" /></td>
-              <td><input class="form-control form-control-sm" type="text" name="description"/></td>
-              <td>-</td>
-              <td>-</td>
-              <td>
-                <button class="btn btn-outline-primary btn-sm" name="mode" value="add"><i class="fa-regular fa-floppy-disk"></i></button>
-              </td>
-            </tr>
-          </form>
-          <tr>
-            <td colspan="7"><hr /></td>
-          </tr>
-          {% for url in urls %}
-          <form action="/shorten" method="post">
-            <tr>
-              <td>{{ url.url_id }}</td>
-              <td><input class="form-control form-control-sm" type="text" name="short_url" value="{{ url.url_short_url }}" readonly /></td>
-              <td><input class="form-control form-control-sm" type="text" name="long_url" value="{{ url.url_long_url }}" maxlength="100" /></td>
-              <td><input class="form-control form-control-sm" type="text" name="title" value="{{ url.url_title }}" maxlength="100" /></td>
-              <td><input class="form-control form-control-sm" type="text" name="description" value="{{ url.url_description }}" /></td>
-              <td>{{ url.url_created_date |datetime }}</td>
-              <td>{{ url.url_updated_date |datetime }}</td>
-              <td>
-                <input type="hidden" name="url_id" value="{{ url.url_id }}" />
-                <button class="btn btn-outline-primary btn-sm" name="mode" value="edit"><i class="fa-regular fa-pen-to-square"></i></button>
-                <button class="btn btn-outline-primary btn-sm" name="mode" value="delete"><i class="fa-regular fa-trash-can"></i></button>
-              </td>
-            </tr>
-          </form>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+  {% for page in range(1, total_page+1) %} 
+    {% if page == current_page  %}
+    <li class="page-item active"><a class="page-link" href="#">{{ page }}</a></li>
+    {% else %}
+    <li class="page-item"><a class="page-link" href="{{ url_for('statistics_page', current_page=page ) }}"> {{ page }} </a></li>
+    {% endif %} 
+  {% endfor %} 
+  {% if current_page < total_page %}
+    <li class="page-item"><a class="page-link" href="{{ url_for('statistics_page', current_page=current_page + 1 ) }}">Next</a></li>
+  {% else %}
+    <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+  {% endif %}
+  </ul>
+</div>
+<div>
+  <table id="list-table" class="table table-striped">
+    <thead class="bg-dark text-light">
+      <tr class="text-center">
+        <th>#</th>
+        <th>Short</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Visits</th>
+        <th>Detail</th>
+      </tr>
+    </thead>
+    <tbody>
+  {%  for data in df_data %}
+      <tr>
+        <td class="text-center">{{ loop.index }}</td>
+        <td>{{ data["url_short_url"] }}</td>
+        <td>{{ data["url_title"] }}</td>
+        <td>{{ data["url_description"] | sub_text(0, 65) }}</td>
+        <td class="text-center">{{ data["count"] }}</td>
+        <td class="text-center"><a href="/info/{{ data['url_short_url'] }}"><button class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-circle-info"></i></button></a></td>
+      </tr>
+  {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
