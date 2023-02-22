@@ -1,0 +1,36 @@
+{% extends "public/base.html" %} 
+{% block content %}
+<div class="text-center">
+  <h1 class="fw-bold mb-2 py-2"><i class="fa-solid fa-at"></i> Contact</h1>
+  <hr />
+</div>
+<div class="row">
+  <div class="container fs-5 text-center" style="width: 80%">
+    <p class="fw-bold">Hi! My name is Eddy, Software Developer.</p>
+  </div>
+  <div class="text-center">
+    <img src="{{ url_for('static', filename='img/contact.jpg') }}" height="400" />
+  </div>
+  <div class="container fs-5 text-center" style="width: 80%">
+    <p class="fw-bold">Hope I can contribute my skills and qualities to your company. Let's work together...</p>
+  </div>
+  <div class="col-md-6 text-center text-md-start d-md-flex justify-content-md-center align-items-md-center py-2">
+    <div>
+      <p class="fs-5 fw-bold mb-0">Crafted by Eddy Chan<br /></p>
+    </div>
+  </div>
+  <div class="col-md-6 d-flex justify-content-center align-items-center justify-content-md-center py-2">
+    <ul class="list-inline mb-0">
+      <li class="list-inline-item">
+        <a href="https://www.linkedin.com/in/cwchanst/" target="_blank"><i class="fab fa-linkedin fs-1 me-2"></i></a>
+      </li>
+      <li class="list-inline-item">
+        <a href="https://github.com/cwchan0212" target="_blank"><i class="fab fa-github fs-1 me-2"></i></a>
+      </li>
+      <li class="list-inline-item">
+        <a href="mailto:cwchanst@gmail.com"><i class="far fa-envelope fs-1 me-2"></i></a> 
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
