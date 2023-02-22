@@ -12,7 +12,7 @@
   {% if loop.index == 1 %}
   <div class="col" style="max-width: 240px">
     {% for k, v in figure.items() %}
-    <div id="figure-box" class="border border-primary rounded mx-2 my-2 px-2 py-2">{{ v | safe }}</div>
+    <div id="figure-box" class="border border-dark rounded mx-2 my-2 px-2 py-2">{{ v | safe }}</div>
     {% endfor %}
   </div>
   {% elif loop.index == 2 %}
@@ -22,7 +22,7 @@
   {% endif %}
   <div class="col d-inline-flex">
     {% for d in div %}
-    <div id="chart-box" class="border border-primary rounded mx-2 my-2" style="width:{{ (100 / div | length) | int }}%">{{ plot[d].plot | safe }}</div>
+    <div id="chart-box" class="border border-dark rounded mx-2 my-2" style="width:{{ (100 / div | length) | int }}%">{{ plot[d].plot | safe }}</div>
     {% endfor %}
   </div>
 </div>

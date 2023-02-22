@@ -25,6 +25,9 @@
                 <a class="nav-link" href="/lists"><i class="fa-solid fa-list"></i> List</a>
               </li>
               <li>
+                <a class="nav-link" href="/search"><i class="fa-solid fa-magnifying-glass"></i> Search</a>
+              </li>              
+              <li>
                 <a class="nav-link" href="/statistics"><i class="fa-solid fa-chart-simple"></i> Stat</a>
               </li>
               <li>
@@ -33,7 +36,10 @@
             </ul>
           </nav>
         </div>
-        <div class="main-content col-sm-10">{% block content %} {% endblock %}</div>
+        <div class="main-content col-sm-10">
+          {% block content %} 
+          {% endblock %}
+        </div>
       </div>
     </div>
 {% block footer%}

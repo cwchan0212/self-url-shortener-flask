@@ -18,7 +18,7 @@ hr {
 
 .main-content {
   margin-top: 0px;
-  /* margin-left: 100px; */
+  margin-left: 100px;
   min-width: 1200px;
 }
 
@@ -53,6 +53,9 @@ header {
   cursor: pointer;
 }
 
+.nav-link i {
+  padding-right: 5px;
+}
 #figure-box {
   display: flex;
   justify-content: space-between;
@@ -77,12 +80,43 @@ a {
   font-size: 14px;
 }
 
-#list-table td  {
+#list-table td {
   font-size: 14px;
 
   vertical-align: middle;
 }
 
+#visitor-table {
+  font-size: 12px;
+  line-height: 80%;
+}
+
+.visitor-info {
+  margin: auto 0px;
+}
+
+.subject {
+  font-weight: bold;
+}
+
+
 th {
   text-align: center;
+}
+
+.pagination>li>a,
+.pagination>li>span {
+  border: 1px solid black;
+}
+
+.pagination>li.active>a {
+  background: black;
+  border: 1px solid black;
+  color: #fff;
+}
+
+#chart-box {
+  display: flex;
+  justify-content: center;
+
 }

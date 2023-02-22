@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from url_shortener import app, views, visitor_views
+from .views import categorise_browser, categorise_os, create_small_bar, create_special_bar, create_small_pie, create_small_line, dashboard_index
 from .models import db, URL, Visitor
 
 from user_agents import parse
@@ -52,7 +53,7 @@ def random_ip_may():
 	query=f"fields=status,message,country,regionName,city,lat,lon,isp,asname,query"
 	
 	ip_list = load_ip_file()
-	index = len(ip_list) - 1
+	index = 10 #len(ip_list) - 1
 	while index > 0:
 		fake_ip = ip_list[index]
 		query_url = f"{base_url}{fake_ip}?{query}"
@@ -72,24 +73,6 @@ def random_ip_may():
 			progress_bar(wait_time, description)		
 		index -= 1
 
-	# for index in reversed(range(592)):
-	# # for index in reversed(range(len(ip_list))):
-	# 	fake_ip = ip_list[index]
-	# 	query_url = f"{base_url}{fake_ip}?{query}"
-	# 	response = requests.get(query_url, headers=headers)
-	# 	print(f"{query_url}")
-	# 	if response.json()["status"] == "fail":
-	# 		wait_time = random.randrange(10,15)					
-	# 		description = f"Waiting:"
-	# 		progress_bar(wait_time, description)
-	# 		update_ip_list(ip_list, fake_ip)
-	# 	else:
-	# 		print(f"#{index+1}/{len(ip_list)}: {fake_ip}")
-	# 		print(f"{response.json()}")
-	# 		wait_time = random.randrange(10,15)					
-	# 		description = f"Waiting:"
-	# 		progress_bar(wait_time, description)
-			
 	exit()
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -101,8 +84,8 @@ def random_ip_april():
 	query=f"fields=status,message,country,regionName,city,lat,lon,isp,asname,query"
 	visitor_dictionary = {}	
 	count = 1
-	visit_range_start = datetime(2022, 10, 1, 0, 0, 0)
-	visit_range_end = datetime(2023, 1, 31, 23, 59, 59)
+	visit_range_start = datetime(2023, 1, 1, 0, 0, 0)
+	visit_range_end = datetime(2023, 2, 28, 23, 59, 59)
 	limit = 100
 	print(f"\nThe total number of clicks is {limit}.")
 	while count <= limit:
@@ -124,9 +107,9 @@ def random_ip_april():
 			update_ip_list(ip_list, fake_ip)
 		else:
 			ip_data = response.json()
-			ip_dictionary = visitor_views.get_ip_dictionary_april(ip_data)
+			ip_dictionary = views.get_ip_dictionary(ip_data)
 			# user_agent = parse(fake_user_agent)
-			user_agent_dictionary = visitor_views.get_user_agent_dictionary(fake_user_agent)
+			user_agent_dictionary = views.get_user_agent_dictionary(fake_user_agent)
 			visitor_dictionary = {**ip_dictionary, **user_agent_dictionary}
 			random_loop = random.randrange(1, 10)
 			print(f"\nNew IP {fake_ip} will attempt [{random_loop}] click(s).")				
@@ -173,19 +156,18 @@ def random_ip():
 		fake_user_agent = user_agent_list[user_agent_index]
 		headers["User-Agent"] = fake_user_agent
 		ipapi_url = f"{base_url}/{fake_ip}/{format}" 
-		response = requests.get(ipapi_url, headers=headers)		
+		response = requests.get(ipapi_url, headers=headers)	
 		
 		if "Sorry, you have been blocked" in response.text:
 			wait_time = random.randrange(5,10)
 			description = "Cooling down"
 			progress_bar(wait_time, description)
-			# time.sleep(5)
 		else:
 			if "error" not in response.json():
 				ip_data = response.json()
-				ip_dictionary = visitor_views.get_ip_dictionary(ip_data)
+				ip_dictionary = views.get_ip_dictionary(ip_data)
 				# user_agent = parse(fake_user_agent)
-				user_agent_dictionary = visitor_views.get_user_agent_dictionary(fake_user_agent)
+				user_agent_dictionary = views.get_user_agent_dictionary(fake_user_agent)
 				visitor_dictionary = {**ip_dictionary, **user_agent_dictionary}
 				random_loop = random.randrange(1, 5)
 				print(f"\nNew IP {fake_ip} will attempt [{random_loop}] click(s).")				
@@ -219,47 +201,11 @@ print(app.config["SQLALCHEMY_DATABASE_URI"])
 
 try:
 	with app.app_context():
-		# random_ip_april()		
-		random_ip_may()
-
-		pass
+		random_ip_april()		
+		# random_ip_may()
 		# db.drop_all()
 		# db.create_all()
 		# print("Tables created successfully")
 except Exception as e:
 	print("An error occurred while update the VISITOR table:", e)
 	exit()
-
-
-
-# def faked_vistor():
-# 	is_faked = True
-# 	ip_data = {}
-
-# 	if is_faked:
-# 		ua = UserAgent()
-# 		fake_user_agent = ua.random
-# 		ip_list = load_ip_file()
-# 		headers = {
-# 			'Accept': 'application/json',
-# 			'User-Agent': fake_user_agent,
-# 			}
-# 		base_url = "https://ipapi.co"
-# 		format = "json"
-# 		while True:
-# 			fake_ip = ip_list[random.randrange(0, len(ip_list))]
-# 			ipapi_url = f"{base_url}/{fake_ip}/{format}" 
-# 			try: 
-# 				response = requests.get(ipapi_url, headers=headers)	
-# 				print(response.text)		
-# 				ip_data = response.json()
-# 				if not "error" in ip_data:
-# 					break
-# 			except json.JSONDecodeError as e:
-# 				# handle the error
-# 				return f"Error: Invalid JSON response from server, {e}"
-# 	else:
-# 		#use real
-# 		pass
-	
-# 	return ip_data
