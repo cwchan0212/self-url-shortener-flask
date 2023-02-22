@@ -3,9 +3,7 @@ import plotly.express as px
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from bs4 import BeautifulSoup
-from url_shortener import app, visitor_views
-# from .visitor_views import categorise_browser, categorise_os, create_small_bar, create_special_bar, create_small_pie, create_small_line, dashboard_index
+from url_shortener import app
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, make_response, jsonify, flash, session, url_for
 from user_agents import parse

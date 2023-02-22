@@ -3,7 +3,7 @@ from tqdm import tqdm
 from datetime import datetime, timedelta
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from url_shortener import app, views, visitor_views
+from url_shortener import app, views
 from .views import categorise_browser, categorise_os, create_small_bar, create_special_bar, create_small_pie, create_small_line, dashboard_index
 from .models import db, URL, Visitor
 
