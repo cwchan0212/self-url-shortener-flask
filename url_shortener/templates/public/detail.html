@@ -45,20 +45,25 @@
         <div class="mx-2 px-2">
           <a href="/redirect/{{ url_info['short_url'] }}"><button class="btn btn-outline-dark btn-sm"  style="width: 100px"><i class="fa-solid fa-arrow-rotate-right mx-1"></i> Redirect</button></a>
         </div>
-
       </td>
     </tr>
     <tr>
       <td><hr /></td>
     </tr>
+  {% set count = url_info["number_of_visitors"] %} 
     <tr>
       <td>
         <div class="d-flex justify-content-around px-4 py-2">
           <div><blockquote><i class="fa-solid fa-quote-left"></i> {{ url_info["description"] }} <i class="fa-solid fa-quote-right"></i></blockquote></div>
-          <div style="padding-left: 20px">{{ plots.visitor_new_return_plot.plot | safe }}</div>
+          <div style="padding-left: 20px">
+  {% if count > 0 %}
+              {{ plots.visitor_new_return_plot.plot | safe }}
+  {% endif %}
+          </div>
         </div>
       </td>
     </tr>
+  {% if count > 0 %}
     <tr>
       <td>
         <div class="d-flex justify-content-around">
@@ -74,6 +79,7 @@
         <div>{{ plots.browser_plot.plot | safe }}</div>
       </td>
     </tr>
+  {% endif %}
   </table>
 </div>
 {% endblock %}

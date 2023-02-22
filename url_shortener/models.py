@@ -144,7 +144,10 @@ class Visitor(db.Model):
 		df_visitors = None
 		total_count = 0
 		try:	
-			query = db.session.query(URL, Visitor).join(URL, Visitor.url_id == URL.url_id).order_by(Visitor.visitor_visited_date.desc())
+			# query = db.session.query(URL, Visitor).join(URL, Visitor.url_id == URL.url_id).order_by(Visitor.visitor_visited_date.desc())
+			query = db.session.query(URL, Visitor).outerjoin(Visitor, Visitor.url_id == URL.url_id).order_by(Visitor.visitor_visited_date.desc())
+			# query = db.session.query(URL, func.count(Visitor.visitor_id)).outerjoin(Visitor, Visitor.url_id == URL.url_id).group_by(URL.url_id).order_by(func.count(Visitor.visitor_id).desc())
+
 			visitors = query.paginate(page=current_page, per_page=page_size)			
 			df_visitors = pd.read_sql(query.statement, engine.connect())
 			total_count = visitors.total

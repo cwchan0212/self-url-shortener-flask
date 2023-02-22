@@ -101,25 +101,37 @@ def figure_lines(figure, suffix_first=None, suffix_second=None, font_icon=None):
 # ---------------------------------------------------------------------------------------------------------------------
 # Create a function "categorise_os" to categorise the os of the DataFrame
 def categorise_os(os):
-	os_list = ["Windows", "Mac OS X", "Linux", "iOS", "Android"]
-	for os_one in os_list:
-		if os_one.lower() in os.lower():
-			return os_one
-	return "Others"
+	if os:
+		os_list = ["Windows", "Mac OS X", "Linux", "iOS", "Android"]
+		for os_one in os_list:
+			if os_one.lower() in os.lower():
+				return os_one
+		return "Others"
+	else:
+		return None
 #
 # ---------------------------------------------------------------------------------------------------------------------
 # Create a function "categorise_browser" to categorise the browser of the DataFrame
 def categorise_browser(browser):
-	browser_list = ["Chrome", "Chromium",
-					"Firefox", "Opera", "Safari", "Edge", "IE"]
-	for browser_one in browser_list:
-		if browser_one.lower() in browser.lower():
-			return browser_one
-	return "Others"
+	if browser:
+		browser_list = ["Chrome", "Chromium",
+						"Firefox", "Opera", "Safari", "Edge", "IE"]
+		for browser_one in browser_list:
+			if browser_one.lower() in browser.lower():
+				return browser_one
+		return "Others"
+	else:
+		return None
 #
 # ---------------------------------------------------------------------------------------------------------------------
 # Create a function "create_special_bar" to plot the specific bar - new/return visitors
 def create_special_bar(df_data, fig_title, fig_x, fig_y, fig_width, fig_height):	
+
+	if len(df_data) == 0:
+		return {
+			"plot": "",
+			"width": 0,
+		}
 	fig = px.bar(df_data, x=fig_x, y=fig_y, color=fig_x)
 	for trace in fig.data:
 		trace.showlegend = False
@@ -150,7 +162,13 @@ def create_special_bar(df_data, fig_title, fig_x, fig_y, fig_width, fig_height):
 # ---------------------------------------------------------------------------------------------------------------------
 # Create a function "create_small_line" to plot the line chart with option of the "shaded area"
 def create_small_line(df_data, fig_title, fig_width, fig_x, fig_y, shade=None):
-	fig = None
+
+	if len(df_data) == 0:
+		return {
+			"plot": "",
+			"width": 0,
+		}
+	
 	if shade:
 		fig = px.area(df_data, x=fig_x, y=fig_y, text=fig_y)
 	else:
@@ -185,10 +203,17 @@ def create_small_line(df_data, fig_title, fig_width, fig_x, fig_y, shade=None):
 		"plot": fig.to_html(full_html=False) if fig else "",
 		"width": fig_width,
 	}
+
 #
 # ---------------------------------------------------------------------------------------------------------------------
 # Create a function "create_small_pie" to plot the pie chart 
 def create_small_pie(df_data, fig_title, fig_values, fig_width):
+	
+	if len(df_data) == 0:
+		return {
+			"plot": "",
+			"width": 0,
+		}
 	
 	fig = px.pie(df_data, values=fig_values, names=df_data.index)
 	fig.update_layout(
@@ -211,10 +236,17 @@ def create_small_pie(df_data, fig_title, fig_values, fig_width):
 		"plot": fig.to_html(full_html=False) if fig else "",
 		"width": fig_width,
 	}
+
 #
 # ---------------------------------------------------------------------------------------------------------------------
 # Create a function "create_small_bar" to plot the bar chart 
 def create_small_bar(df_data, fig_title, fig_width, fig_height=None, fig_orientation="h", fig_inside_label=False):
+
+	if len(df_data) == 0:
+		return {
+			"plot": "",
+			"width": 0,
+		}
 
 	fig = px.bar(
 		df_data,
@@ -259,6 +291,7 @@ def create_small_bar(df_data, fig_title, fig_width, fig_height=None, fig_orienta
 		"plot": fig.to_html(full_html=False) if fig else "",
 		"width": fig_width,
 	}
+
 #
 # ---------------------------------------------------------------------------------------------------------------------
 # Create a function "convert_to_seconds" to convert the timestamp from the DataFrame to second
@@ -280,7 +313,8 @@ def create_df_count_list(df, groupby_cols, count_col, start_index=None, end_inde
 	for groups, count in df_group_count.items():
 		df_dictionary = dict(zip(groupby_cols, groups))
 		df_dictionary["count"] = count
-		df_count_list.append(df_dictionary)
+		df_count_list.append(df_dictionary)		
+	df_count_list = sorted(df_count_list, key=lambda x: x["url_id"])
 	return df_count_list
 #
 # *********************************************************************************************************************
@@ -464,9 +498,9 @@ def dashboard_index():
 	return render_template("/public/dashboard.html", plot=plots, special_plot=special_plots, figure=figures, divs=div_list)
 #
 # ---------------------------------------------------------------------------------------------------------------------
-# Route: /lists - render "lists.html" with "urls", "short"
-@app.route("/lists")
-def lists():
+# Route: /list - render "list.html" with "urls", "short"
+@app.route("/list")
+def list():
 	short = secrets.token_hex(3)
 	urls  = URL.all_url_pages(1, page_size)
 	total_records = len(URL.all_url())
@@ -486,12 +520,12 @@ def lists():
 	}
 	print(pages_dictionary)
 
-	return render_template("public/lists.html", urls=urls, short=short, pages=pages_dictionary)
+	return render_template("public/list.html", urls=urls, short=short, pages=pages_dictionary)
 #
 # ---------------------------------------------------------------------------------------------------------------------
-# Route: /lists/<int:current_page> - render "lists.html" with "urls", "short"
-@app.route("/lists/<int:current_page>")
-def lists_page(current_page=None):
+# Route: /list/<int:current_page> - render "list.html" with "urls", "short"
+@app.route("/list/<int:current_page>")
+def list_page(current_page=None):
 	short = secrets.token_hex(3)
 	urls  = URL.all_url_pages(current_page, page_size)
 	total_records = len(URL.all_url())
@@ -508,7 +542,7 @@ def lists_page(current_page=None):
 		"page_size": page_size,
 	}
 	print(pages_dictionary)
-	return render_template("public/lists.html", urls=urls, short=short, pages=pages_dictionary)
+	return render_template("public/list.html", urls=urls, short=short, pages=pages_dictionary)
 
 #
 # ---------------------------------------------------------------------------------------------------------------------
@@ -542,7 +576,7 @@ def search_page(current_page=1):
 @app.route("/statistics")
 def statistics():	
 	df, total = Visitor.visitors_df()
-	groupby_cols = ['url_short_url', 'url_title', 'url_description']
+	groupby_cols = ['url_id', 'url_short_url', 'url_long_url', 'url_title', 'url_description', 'url_created_date']
 	count_col = "visitor_ip"
 	df_count_list = create_df_count_list(df, groupby_cols, count_col)
 	total_records = len(df_count_list)
@@ -550,7 +584,6 @@ def statistics():
 	total_pages = math.ceil(len(df_count_list) / page_size)
 	start_record = (current_page - 1) * page_size + 1
 	end_record = min(start_record + page_size - 1, total_records)
-	
 	df_data = df_count_list[:end_record]
 	pages_dictionary = {
 		"current_page": current_page,
@@ -560,6 +593,7 @@ def statistics():
 		"total_records": total_records,
 		"page_size": page_size,
 	}
+	print(pages_dictionary)
 	return render_template("public/statistics.html", df_data=df_data, pages=pages_dictionary)
 #
 # ---------------------------------------------------------------------------------------------------------------------
@@ -570,7 +604,7 @@ def statistics():
 def statistics_page(current_page=1):
 	
 	df, total = Visitor.visitors_df()
-	groupby_cols = ['url_short_url', 'url_title', 'url_description']
+	groupby_cols = ['url_id', 'url_short_url', 'url_long_url', 'url_title', 'url_description', 'url_created_date']
 	count_col = "visitor_ip"
 	df_count_list = create_df_count_list(df, groupby_cols, count_col)
 	total_records = len(df_count_list)
@@ -595,8 +629,28 @@ def statistics_page(current_page=1):
 # Route: /info/<string:short_url> - Render "detail.html" with "url_info, "referrer", "visitor_data", "plots"
 @app.route("/info/<string:short_url>")
 def detail(short_url):
+
+
 	df, total = Visitor.visitors_df()
-	# df = pd.read_csv("url_visitor.csv", index_col=0)
+	groupby_cols = ['url_id', 'url_short_url', 'url_long_url', 'url_title', 'url_description', 'url_created_date']
+	count_col = "visitor_ip"
+	df_count_list = create_df_count_list(df, groupby_cols, count_col)
+
+	short_dict = [ data for data in df_count_list if data["url_short_url"] == short_url][0]
+
+	# Set "url_info" dictionary to store the figures: "short_url", "long_url", "title", "description", "created_date", "number_of_visitors"
+	url_info = {
+		"short_url": short_dict['url_short_url'],
+		"long_url": short_dict['url_long_url'],
+		"title": short_dict['url_title'],
+		"description":  short_dict['url_description'],
+		"created_date": short_dict['url_created_date'],
+		"number_of_visitors": short_dict["count"], 
+	}
+
+	visit_count = short_dict["count"]	
+
+	df, total = Visitor.visitors_df()
 	# Select the Dataframe with "url_short_url"
 	df_short_url = df[df["url_short_url"] == short_url]	
 	# Select the sub-DataFrame with the columns url_short_url', 'url_long_url', 'url_title', 'url_description', 
@@ -604,6 +658,7 @@ def detail(short_url):
 	# 'visitor_os', 'visitor_browser'
 	
 	new_df = df_short_url.loc[:, ['url_short_url', 'url_long_url', 'url_title', 'url_description', 'url_created_date', 'visitor_ip', 'visitor_visited_date', 'visitor_city', 'visitor_country', 'visitor_machine', 'visitor_os', 'visitor_browser']]
+
 	new_df.loc[:, 'url_created_date'] = pd.to_datetime(new_df['url_created_date'])
 	new_df.loc[:, 'visitor_visited_date'] = pd.to_datetime(new_df['visitor_visited_date'])
 
@@ -670,25 +725,15 @@ def detail(short_url):
 	browser_orientation = "v"
 	browser_plot = create_small_bar(browser_data, browser_title, browser_width, fig_orientation=browser_orientation)
 
-	# Set "url_info" dictionary to store the figures: "short_url", "long_url", "title", "description", "created_date", "number_of_visitors"
-	url_info = {
-		"short_url": new_df['url_short_url'].values[0],
-		"long_url": new_df['url_long_url'].values[0],
-		"title": new_df['url_title'].values[0],
-		"description":  new_df['url_description'].values[0],
-		"created_date": new_df['url_created_date'].values[0],
-		"number_of_visitors": len(new_df), 
-	}
-
 	# Set "plots" dictionary to store the plots: "visitor_new_return_plot", "country_plot", "week_count_plot", "machine_plot", 
 	# "os_plot", "browser_plot"
 	plots = {
-		"visitor_new_return_plot": visitor_new_return_plot,
-		"country_plot": country_plot,
-		"week_count_plot": week_count_plot,
-		"machine_plot": machine_plot,
-		"os_plot": os_plot,
-		"browser_plot": browser_plot,
+		"visitor_new_return_plot": visitor_new_return_plot if visit_count else None,
+		"country_plot": country_plot if visit_count else None,
+		"week_count_plot": week_count_plot if visit_count else None,
+		"machine_plot": machine_plot if visit_count else None,
+		"os_plot":  os_plot if visit_count else None,
+		"browser_plot": browser_plot if visit_count else None,
 	}
 
 	# Set the referrer to store the referrer link for backward
@@ -756,9 +801,8 @@ def shorten():
 			else:
 				message = f"Fail to create shorten url."
 			flash(message)
-		# urls = URL.all_url()
 		urls  = URL.all_url_pages(1)
-		return render_template("public/lists.html", urls=urls, short=short)
+		return redirect(request.referrer)	
 	elif mode == "edit":		
 		url_id = None
 		row_affected = 0
@@ -772,7 +816,7 @@ def shorten():
 		else:
 			message = f"No id for url is found."
 			flash(message)
-			return redirect(url_for('lists'))
+			return redirect(url_for('list'))
 	elif mode == "delete":
 		url_id = None
 		row_affected = 0
@@ -782,13 +826,13 @@ def shorten():
 			row_affected = URL.delete_by_id(url_id)
 			message = f"The URL #{url_dictionary['short_url']} is deleted successfully. [{row_affected}]"
 			flash(message)
-			return redirect(url_for('lists'))
+			return redirect(url_for('list'))
 		else:
 			message = f"No id for url is found."
 			flash(message)
-			return redirect(url_for('lists'))
+			return redirect(url_for('list'))
 	else:
-		return redirect(url_for('lists'))
+		return redirect(url_for('list'))
 #
 # ---------------------------------------------------------------------------------------------------------------------
 # Route: /contact - Render "contact.html"

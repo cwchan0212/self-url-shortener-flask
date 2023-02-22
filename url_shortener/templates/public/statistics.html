@@ -65,7 +65,9 @@
         <td>{{ data["url_title"] }}</td>
         <td>{{ data["url_description"] | sub_text(0, 65) }}</td>
         <td class="text-center">{{ data["count"] }}</td>
-        <td class="text-center"><a href="/info/{{ data['url_short_url'] }}"><button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-circle-info"></i></button></a></td>
+        <td class="text-center">
+          <a href="/info/{{ data['url_short_url'] }}"><button class="btn btn-outline-dark btn-sm"><i class="fa-solid fa-circle-info"></i></button></a>
+        </td>
       </tr>
   {% endfor %}
     </tbody>

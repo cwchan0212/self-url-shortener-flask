@@ -1,4 +1,3 @@
-import os, psycopg2
 import urllib.parse as up
 
 from flask import Flask
@@ -13,16 +12,18 @@ app.config["MAX_CONTENT_LENGTH"] = app.config['MAX_CONTENT_LENGTH'] * 1024 * 102
 # ---------------------------------------------------------------------------------------------------------------------
 # Connect to ElephantSQL
 # 
-db_host = app.config["DB_HOST"]
-db_user = app.config["DB_USERNAME"]
-db_pass = app.config["DB_PASSWORD"]
-db_name = app.config["DB_USERNAME"]
+remote = 0
+if remote:
+    db_host = app.config["DB_HOST"]
+    db_user = app.config["DB_USERNAME"]
+    db_pass = app.config["DB_PASSWORD"]
+    db_name = app.config["DB_USERNAME"]
 
-database_uri = f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}"
-app.config.update(
-    SQLALCHEMY_DATABASE_URI=database_uri,
-    SQLALCHEMY_TRACK_MODIFICATIONS=False,
-)
+    database_uri = f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}"
+    app.config.update(
+        SQLALCHEMY_DATABASE_URI=database_uri,
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+    )
 # ---------------------------------------------------------------------------------------------------------------------
 
 print(f" # It is a {app.config['ENV']} mode.")
