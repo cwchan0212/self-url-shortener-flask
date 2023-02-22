@@ -1,11 +1,14 @@
 {% extends "public/base.html" %}
-<script>
-  let ip_reg = "^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$";
-</script>
+<!--
+  IP Address Regexp as xxx.xxx.xxx.xxx: ^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
+  IP Address Regexp as x.x.x.x: ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+  --->
 {% block content %}
 <div class="text-center">
   <h1 class="fw-bold mb-2 py-1"><i class="fa-solid fa-magnifying-glass"></i> Search</h1>
+  <h5 class="mb-0 py-0">IP address lookup</h5>
   <hr />
+  
 </div>
 
 <div>
@@ -14,8 +17,11 @@
       <th>
         <form action="/search" method="post">
           <div class="d-flex justify-content-between">
-            <input class="form-control form-control-sm" type="text" name="ip_address" id="ip_address" placeholder="Enter IP Address..." value="151.121.108.135" />
+            <input class="form-control form-control-sm" type="text" name="ip_address" id="ip_address" placeholder="Enter IP Address..." value="{{ ip_address }}" pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$" />
             <button class="btn btn-outline-dark btn-sm" type="submit" name="query" value="search" style="width: 80px"><i class="fa-solid fa-magnifying-glass-location"></i> Find</button>
+          </div>
+          <div class="text-start my-1" style="font-size: 13px; font-weight: normal">
+            Sample: 153.233.136.86, 175.195.217.83
           </div>
         </form>
       </th>
@@ -78,5 +84,11 @@
     </tbody>
   </table>
 </div>
+  {% else %}
+    {% if ip_address %}
+  <div class="container d-flex justify-content-between">
+    No records found.
+  </div>
+    {% endif %}
   {% endif %} 
 {% endblock %}

@@ -5,25 +5,30 @@
 {% block content %}
 <div class="text-center">
   <h1 class="fw-bold mb-2 py-2"><i class="fa-solid fa-house"></i> Home</h1>
-  <hr />
+  <h5 class="mb-0 py-0">Key metrics at a glance</h5>
+  <hr />  
 </div>
-{% for div in divs %}
+
+  {% for div in divs %}
 <div class="row">
-  {% if loop.index == 1 %}
+    {% if loop.index == 1 %}
   <div class="col" style="max-width: 240px">
-    {% for k, v in figure.items() %}
+      {% for k, v in figure.items() %}
     <div id="figure-box" class="border border-dark rounded mx-2 my-2 px-2 py-2">{{ v | safe }}</div>
-    {% endfor %}
+      {% endfor %}
   </div>
-  {% elif loop.index == 2 %}
+    {% elif loop.index == 2 %}
   <div class="col" style="max-width: 240px">{{ special_plot["visitor_new_return"]["plot"] | safe }}</div>
-  {% else %}
+    {% else %}
   <div class="col" style="max-width: 240px">&nbsp;</div>
-  {% endif %}
+    {% endif %}
   <div class="col d-inline-flex">
     {% for d in div %}
     <div id="chart-box" class="border border-dark rounded mx-2 my-2" style="width:{{ (100 / div | length) | int }}%">{{ plot[d].plot | safe }}</div>
     {% endfor %}
   </div>
 </div>
-{% endfor %} {% endblock %} {% block footer%} {% endblock %}
+  {% endfor %} 
+{% endblock %} 
+{% block footer%} 
+{% endblock %}

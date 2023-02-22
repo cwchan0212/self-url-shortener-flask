@@ -1,7 +1,8 @@
 {% extends "public/base.html" %} 
 {% block content %}
 <div class="text-center">
-  <h2 class="fw-bold mb-2 py-1"><i class="fa-solid fa-circle-info"></i> Detail</h2>
+  <h1 class="fw-bold mb-2 py-1"><i class="fa-solid fa-circle-info"></i> Detail</h1>
+  <h5 class="mb-0 py-0">Detailed Short URLs analysis</h5>
   <hr />
 </div>
 <div class="container" style="width: 80%">
@@ -19,7 +20,7 @@
         <div>(Created on {{ url_info["created_date"] | date_string }})</div>
         
         <div>
-          <a href="{{ url_info['long_url'] }}" target="_blank"><button class="btn btn-outline-dark btn-sm" style="width: 100px"><i class="fa-regular fa-window-maximize"></i> Full View</button></a>
+          <a href="{{ url_info['long_url'] }}" target="_blank"><button class="btn btn-outline-dark btn-sm" style="width: 100px"><i class="fa-regular fa-window-maximize mx-1"></i> Full View</button></a>
         </div>
       </td>
     </tr>
@@ -39,10 +40,10 @@
     <tr>
       <td class="d-flex justify-content-center px-2 py-2">
         <div class="mx-2 px-2">
-          <a href="{{ referrer }}"><button class="btn btn-outline-dark btn-sm" style="width: 100px"><i class="fa-solid fa-rotate-left"></i> Back</button></a>
+          <a href="{{ referrer }}"><button class="btn btn-outline-dark btn-sm" style="width: 100px"><i class="fa-solid fa-rotate-left mx-1"></i> Back</button></a>
         </div>
         <div class="mx-2 px-2">
-          <a href="/redirect/{{ url_info['short_url'] }}"><button class="btn btn-outline-dark btn-sm"  style="width: 100px"><i class="fa-solid fa-arrow-rotate-right"></i> Redirect</button></a>
+          <a href="/redirect/{{ url_info['short_url'] }}"><button class="btn btn-outline-dark btn-sm"  style="width: 100px"><i class="fa-solid fa-arrow-rotate-right mx-1"></i> Redirect</button></a>
         </div>
 
       </td>
@@ -53,7 +54,7 @@
     <tr>
       <td>
         <div class="d-flex justify-content-around px-4 py-2">
-          <div>{{ url_info["description"] }}</div>
+          <div><blockquote><i class="fa-solid fa-quote-left"></i> {{ url_info["description"] }} <i class="fa-solid fa-quote-right"></i></blockquote></div>
           <div style="padding-left: 20px">{{ plots.visitor_new_return_plot.plot | safe }}</div>
         </div>
       </td>

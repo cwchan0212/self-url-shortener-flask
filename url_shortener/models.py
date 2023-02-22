@@ -6,6 +6,7 @@ from random import shuffle
 
 db = SQLAlchemy(app)
 engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+
 page_size = 20
 
 # =====================================================================================================================
