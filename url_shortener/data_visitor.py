@@ -8,25 +8,31 @@ from .views import categorise_browser, categorise_os, create_small_bar, create_s
 from .models import db, URL, Visitor
 from user_agents import parse
 
-# ---------------------------------------------------------------------------------------------------------------------
+# =====================================================================================================================
 # Create a function "progress_bar" with the parameters "wait_time" and "description" to display the loading time
 #
 def progress_bar(wait_time, description):
     for i in tqdm(range(wait_time), desc=description, unit="seconds"):
         time.sleep(1)  
-
+#
+# ---------------------------------------------------------------------------------------------------------------------
+# Create a function "load_ip_file" to load in a text file
 def load_ip_file():
 	ip_list = []
 	with open("url_shortener/templates/public/data/ip.txt", "r") as file:
 		ip_list = file.read().splitlines()
 	return ip_list
-
+#
+# ---------------------------------------------------------------------------------------------------------------------
+# Create a function "load_user_agent_file" to load the user agent text file
 def load_user_agent_file():
 	user_agent_list = []
 	with open("url_shortener/templates/public/data/user_agent.txt", "r") as file:
 		user_agent_list = file.read().splitlines()
 	return user_agent_list
-	
+#
+# ---------------------------------------------------------------------------------------------------------------------
+# Create a function "update_ip_list" to remove the bad IP address from the ip.txt text file
 def update_ip_list(ip_list, error_ip):
 	if ip_list and error_ip:
 		new_ip_list = ip_list[:]
@@ -36,23 +42,22 @@ def update_ip_list(ip_list, error_ip):
 			print(f"\nTry to update the file ip.txt.")
 			with open("url_shortener/templates/public/data/ip.txt", "w") as file:
 				file.write("\n".join(new_ip_list))
-			print(f"Record the ip address [{error_ip}] with error.\n")
+			print(f"Record the IP address [{error_ip}] with error.\n")
 			with open("url_shortener/templates/public/data/error_ip.txt", "a") as file:
 				file.write(f"{error_ip}\n")
 		except IOError as e:
 			print(e)
-
+#
 # ---------------------------------------------------------------------------------------------------------------------
-# For ip-api only
-
-def random_ip_may():
+# Create a function "check_ip_status" to check the status of ip and remove the bad one from the ip.txt file
+def check_ip_status():
 	user_agent_list = load_user_agent_file()
 	headers = {'Accept': 'application/json'	}
 	base_url = "http://ip-api.com/json/"
 	query=f"fields=status,message,country,regionName,city,lat,lon,isp,asname,query"
 	
 	ip_list = load_ip_file()
-	index = 10 #len(ip_list) - 1
+	index = len(ip_list) - 1
 	while index > 0:
 		fake_ip = ip_list[index]
 		query_url = f"{base_url}{fake_ip}?{query}"
@@ -73,10 +78,10 @@ def random_ip_may():
 		index -= 1
 
 	exit()
-
+#
 # ---------------------------------------------------------------------------------------------------------------------
-# For ip-api only
-def random_ip_april():
+# Create a function "add_random_visitor" to add the random visitor (ip + user agent) for simulation
+def add_random_visitor():
 	user_agent_list = load_user_agent_file()
 	headers = {'Accept': 'application/json'	}
 	base_url = "http://ip-api.com/json/"
@@ -84,7 +89,9 @@ def random_ip_april():
 	visitor_dictionary = {}	
 	count = 1
 	visit_range_start = datetime(2023, 1, 1, 0, 0, 0)
+	# Set the end date of the visitor visited
 	visit_range_end = datetime(2023, 2, 28, 23, 59, 59)
+	# Set the number of visitors added
 	limit = 100
 	print(f"\nThe total number of clicks is {limit}.")
 	while count <= limit:
@@ -128,19 +135,16 @@ def random_ip_april():
 					break
 				count += 1
 	exit()
-
-
-
+#
 # ---------------------------------------------------------------------------------------------------------------------
-# For ipapi only
-def random_ip():
-	
+# Create a function "ipapi.co" to add the random visitor (ip + user agent)
+# Depreciated as API blocked
+def random_visitor():	
 	user_agent_list = load_user_agent_file()
 	headers = {'Accept': 'application/json'	}
 	base_url = "https://ipapi.co"
 	format = "json"
 	visitor_dictionary = {}	
-	# print(len(urls))
 	count = 1
 	visit_range_start = datetime(2022, 10, 1, 0, 0, 0)
 	visit_range_end = datetime(2023, 1, 31, 23, 59, 59)
@@ -194,14 +198,15 @@ def random_ip():
 					update_ip_list(ip_list, fake_ip)
 					continue		
 	exit()
-
+#
+# ---------------------------------------------------------------------------------------------------------------------
+# Main function to insert the random visitors
 app.config.from_prefixed_env()
-print(app.config["SQLALCHEMY_DATABASE_URI"])
-
+print(f"{app.config['SQLALCHEMY_DATABASE_URI']}")
 try:
 	with app.app_context():
-		random_ip_april()		
-		# random_ip_may()
+		add_random_visitor()		
+		# check_ip_status()
 		# db.drop_all()
 		# db.create_all()
 		# print("Tables created successfully")

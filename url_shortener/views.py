@@ -100,7 +100,6 @@ def figure_lines(figure, suffix_first=None, suffix_second=None, font_icon=None):
 #
 # ---------------------------------------------------------------------------------------------------------------------
 # Create a function "categorise_os" to categorise the os of the DataFrame
-#
 def categorise_os(os):
 	os_list = ["Windows", "Mac OS X", "Linux", "iOS", "Android"]
 	for os_one in os_list:
@@ -120,12 +119,10 @@ def categorise_browser(browser):
 #
 # ---------------------------------------------------------------------------------------------------------------------
 # Create a function "create_special_bar" to plot the specific bar - new/return visitors
-def create_special_bar(df_data, fig_title, fig_x, fig_y, fig_width, fig_height):
-	
+def create_special_bar(df_data, fig_title, fig_x, fig_y, fig_width, fig_height):	
 	fig = px.bar(df_data, x=fig_x, y=fig_y, color=fig_x)
 	for trace in fig.data:
 		trace.showlegend = False
-
 	fig.update_layout(
 		title=fig_title, 
 		width=fig_width, height=fig_height,
@@ -293,283 +290,6 @@ def create_df_count_list(df, groupby_cols, count_col, start_index=None, end_inde
 @app.route("/")
 def index():
 	return redirect(url_for('dashboard_index'))
-#
-# ---------------------------------------------------------------------------------------------------------------------
-# Route: /search - render "search.html"
-@app.route("/search", methods=["GET", "POST"])
-def search():
-	ip_address, visitors = "", None
-	if request.method == "GET":
-		return render_template("/public/search.html", ip_address=ip_address, visitors=visitors)
-	else:
-		ip_address = request.form["ip_address"]
-		if ip_address:
-			session["ip_address"] = ip_address
-			visitors = Visitor.get_url_visitor_by_ip(ip_address, 1, page_size)
-		return render_template("/public/search.html", ip_address=ip_address, visitors=visitors, per_page=page_size)
-	#
-# ---------------------------------------------------------------------------------------------------------------------
-# Route: /search - render "search.html"
-@app.route("/search/<int:current_page>", methods=["GET"])
-def search_page(current_page=1):	
-	if "ip_address" in session:
-		ip_address = session["ip_address"]		
-		visitors = Visitor.get_url_visitor_by_ip(ip_address, current_page, page_size)
-		return render_template("/public/search.html", ip_address=ip_address, visitors=visitors, per_page=page_size)
-	else:
-		return redirect(url_for("search"))
-
-# ---------------------------------------------------------------------------------------------------------------------
-# Route: /statistics - Render "statistics.html" with the DataFrame group by "url_short_url", "url_title", "url_description"
-#
-@app.route("/statistics")
-def statistics():	
-	df, total = Visitor.visitors_df()
-	groupby_cols = ['url_short_url', 'url_title', 'url_description']
-	count_col = "visitor_ip"
-	df_count_list = create_df_count_list(df, groupby_cols, count_col)
-	total_records = len(df_count_list)
-	current_page = 1	
-	total_pages = math.ceil(len(df_count_list) / page_size)
-	start_record = (current_page - 1) * page_size + 1
-	end_record = min(start_record + page_size - 1, total_records)
-	
-	df_data = df_count_list[:end_record]
-	pages_dictionary = {
-		"current_page": current_page,
-		"total_pages": total_pages,
-		"start_record": start_record,
-		"end_record": end_record,
-		"total_records": total_records,
-		"page_size": page_size,
-	}
-	return render_template("public/statistics.html", df_data=df_data, pages=pages_dictionary)
-#
-# ---------------------------------------------------------------------------------------------------------------------
-# Route: /statistics/<int:current_page> - Render "statistics.html" with the DataFrame group by "url_short_url", 
-# "url_title", "url_description", with pagination
-#
-@app.route("/statistics/<int:current_page>")
-def statistics_page(current_page=1):
-	
-	df, total = Visitor.visitors_df()
-	groupby_cols = ['url_short_url', 'url_title', 'url_description']
-	count_col = "visitor_ip"
-	df_count_list = create_df_count_list(df, groupby_cols, count_col)
-	total_records = len(df_count_list)
-	
-	total_pages = math.ceil(len(df_count_list) / page_size)
-	start_record = (current_page - 1) * page_size + 1
-	end_record = min(start_record + page_size - 1, total_records)	
-	df_data = df_count_list[start_record-1:end_record]
-
-	pages_dictionary = {
-		"current_page": current_page,
-		"total_pages": total_pages,
-		"start_record": start_record,
-		"end_record": end_record,
-		"total_records": total_records,
-		"page_size": page_size,
-	}
-
-	return render_template("public/statistics.html", df_data=df_data, pages=pages_dictionary)
-#
-# ---------------------------------------------------------------------------------------------------------------------
-# Route: /contact - Render "contact.html"
-@app.route("/contact")
-def contact():
-	return render_template("/public/contact.html")
-#
-# ---------------------------------------------------------------------------------------------------------------------
-# Route: /info/<string:short_url> - Render "detail.html" with "url_info, "referrer", "visitor_data", "plots"
-@app.route("/info/<string:short_url>")
-def detail(short_url):
-	df, total = Visitor.visitors_df()
-	# df = pd.read_csv("url_visitor.csv", index_col=0)
-	# Select the Dataframe with "url_short_url"
-	df_short_url = df[df["url_short_url"] == short_url]	
-	# Select the sub-DataFrame with the columns url_short_url', 'url_long_url', 'url_title', 'url_description', 
-	# 'url_created_date', 'visitor_ip', 'visitor_visited_date', 'visitor_city', 'visitor_country', 'visitor_machine', 
-	# 'visitor_os', 'visitor_browser'
-	
-	new_df = df_short_url.loc[:, ['url_short_url', 'url_long_url', 'url_title', 'url_description', 'url_created_date', 'visitor_ip', 'visitor_visited_date', 'visitor_city', 'visitor_country', 'visitor_machine', 'visitor_os', 'visitor_browser']]
-	new_df.loc[:, 'url_created_date'] = pd.to_datetime(new_df['url_created_date'])
-	new_df.loc[:, 'visitor_visited_date'] = pd.to_datetime(new_df['visitor_visited_date'])
-
-	# Plot -  Number of first/return visitors
-	visitor_ip_all = new_df.groupby(["visitor_ip"])
-	visitor_ip_once = visitor_ip_all.filter(lambda x: len(x) == 1)
-	visitor_ip_return = len(visitor_ip_all) - len(visitor_ip_once)
-	visitor_new_return = [len(visitor_ip_once), visitor_ip_return]
-	# Form the DataFrame for number of first/return visitors
-	df_visitor_new_return = pd.DataFrame({
-		"visitor_type": ["New", "Return"],
-		"count": visitor_new_return,
-	})
-	visitor_new_return_title = "Visitors by User Type"
-	visitor_new_return_x = "visitor_type"
-	visitor_new_return_y = "count"
-	visitor_new_return_width = 220
-	visitor_new_return_height = 200
-	visitor_new_return_plot = create_special_bar(df_visitor_new_return, visitor_new_return_title, visitor_new_return_x, visitor_new_return_y, visitor_new_return_width, visitor_new_return_height)
-	
-	# Plot - Countries that Visitors are from	
-	country_groupby = new_df.groupby("visitor_country")
-	df_country = country_groupby["visitor_ip"].nunique()
-	visitor_countries = df_country.sort_values(ascending=False).head()
-	country_data = visitor_countries
-	country_title = "Top 5 Countries that Visitors are from"
-	country_values = "visitor_ip"
-	country_width = 400
-	country_plot = create_small_pie(country_data, country_title, country_values, country_width)
-
-	# Plot - Visits by Weeks of Year
-	df['week'] = pd.to_datetime(new_df['visitor_visited_date']).dt.to_period("W").astype(str)
-	df_week = df.groupby(["week"])
-	week_count_data = df_week.size().reset_index(name="count_per_week")
-	week_count_width = 400
-	week_count_x = "week"
-	week_count_y = "count_per_week"
-	week_count_title = "Visits by Weeks of Year"
-	week_count_plot = create_small_line(week_count_data, week_count_title, week_count_width, week_count_x, week_count_y, True)
-
-	# Plot - Machine used by the visitors
-	machine_width = 300 
-	machine_title = "Machine"
-	machine_orientation = "v"
-	machine_group = new_df.groupby(["visitor_machine"])
-	machine_data = machine_group.count()["visitor_ip"].sort_values(ascending=False)		
-	machine_plot = create_small_bar(machine_data, machine_title, machine_width, fig_orientation=machine_orientation)
-
-	# Plot - OS used by the visitors
-	df["os_category"] = new_df["visitor_os"].apply(lambda x: categorise_os(x))
-	os_group = df.groupby(["os_category"])
-	os_data = os_group["visitor_os"].count().sort_values(ascending=False).head()
-	os_title = "OS"
-	os_width = 300
-	os_orientation = "v"
-	os_plot = create_small_bar(os_data, os_title, os_width, fig_orientation=os_orientation)
-
-	# Plot - Browser used by the visitors
-	df["browser_category"] = new_df["visitor_browser"].apply(lambda x: categorise_browser(x))
-	browser_group = df.groupby(["browser_category"])	
-	browser_data = browser_group["visitor_browser"].count().sort_values(ascending=False).head()
-	browser_title = "Browser"
-	browser_width = 300
-	browser_orientation = "v"
-	browser_plot = create_small_bar(browser_data, browser_title, browser_width, fig_orientation=browser_orientation)
-
-	# Set "url_info" dictionary to store the figures: "short_url", "long_url", "title", "description", "created_date", "number_of_visitors"
-	url_info = {
-		"short_url": new_df['url_short_url'].values[0],
-		"long_url": new_df['url_long_url'].values[0],
-		"title": new_df['url_title'].values[0],
-		"description":  new_df['url_description'].values[0],
-		"created_date": new_df['url_created_date'].values[0],
-		"number_of_visitors": len(new_df), 
-	}
-
-	# Set "plots" dictionary to store the plots: "visitor_new_return_plot", "country_plot", "week_count_plot", "machine_plot", 
-	# "os_plot", "browser_plot"
-	plots = {
-		"visitor_new_return_plot": visitor_new_return_plot,
-		"country_plot": country_plot,
-		"week_count_plot": week_count_plot,
-		"machine_plot": machine_plot,
-		"os_plot": os_plot,
-		"browser_plot": browser_plot,
-	}
-
-	# Set the referrer to store the referrer link for backward
-	referrer = request.referrer if request.referrer else request.url
-	return render_template("public/detail.html", referrer=referrer, url_info=url_info, plots=plots)
-#
-# ---------------------------------------------------------------------------------------------------------------------
-# Route: /redirect - render "redirect.html" with "url_short_url"
-@app.route("/redirect/<string:short_url>")
-def redirect_short(short_url):
-	headers = {'Accept': 'application/json'	}
-	base_url = "http://ip-api.com/json"
-	query = f"fields=status,message,country,regionName,city,lat,lon,isp,asname,query"
-	ip_dictionary, user_agent_dictionary, visitor_dictionary = {}, {}, {}
-	count = 0
-	# ip_address = request.remote_addr
-	# Check the validity of ip address
-	response = requests.get(base_url, headers=headers)
-	ip_data = response.json()
-
-	if ip_data["status"] == "success":
-		ip_dictionary = get_ip_dictionary(ip_data)
-		user_agent_string = request.user_agent.string
-		user_agent_dictionary = get_user_agent_dictionary(user_agent_string)
-	else:
-		ip_list = load_ip_file()
-		ip_index = random.randrange(len(ip_list))
-		fake_ip = ip_list[ip_index]
-		query_url = f"{base_url}/{fake_ip}?{query}"
-		response = requests.get(query_url, headers=headers)
-		ip_data = response.json()
-		ip_dictionary = get_ip_dictionary(ip_data)
-		user_agent_list = load_user_agent_file()	
-		user_agent_index = random.randrange(len(user_agent_list))
-		user_agent_string = user_agent_list[user_agent_index]
-		user_agent_dictionary = get_user_agent_dictionary(user_agent_string)
-		user_agent_dictionary["bot"] = True
-
-	visitor_dictionary = {**ip_dictionary, **user_agent_dictionary}
-	url = URL.find_by_short_url(short_url)
-	if url:
-		visitor_dictionary["url_id"] = url.url_id
-		count = Visitor.add_visitor(**visitor_dictionary)
-	return render_template("/public/redirect.html", url=url, visitor=visitor_dictionary)
-#
-# ---------------------------------------------------------------------------------------------------------------------
-# Route: /lists - render "lists.html" with "urls", "short"
-@app.route("/lists")
-def lists():
-	short = secrets.token_hex(3)
-	urls  = URL.all_url_pages(1, page_size)
-	total_records = len(URL.all_url())
-	current_page = 1
-
-	total_pages = math.ceil(total_records / page_size)
-	start_record = (current_page - 1) * page_size + 1
-	end_record = min(start_record + page_size - 1, total_records)
-
-	pages_dictionary = {
-		"current_page": current_page,
-		"total_pages": total_pages,
-		"start_record": start_record,
-		"end_record": end_record,
-		"total_records": total_records,
-		"page_size": page_size,
-	}
-	print(pages_dictionary)
-
-	return render_template("public/lists.html", urls=urls, short=short, pages=pages_dictionary)
-#
-# ---------------------------------------------------------------------------------------------------------------------
-# Route: /lists/<int:current_page> - render "lists.html" with "urls", "short"
-@app.route("/lists/<int:current_page>")
-def lists_page(current_page=None):
-	short = secrets.token_hex(3)
-	urls  = URL.all_url_pages(current_page, page_size)
-	total_records = len(URL.all_url())
-	total_pages = math.ceil(total_records / page_size)
-	start_record = (current_page - 1) * page_size + 1
-	end_record = min(start_record + page_size - 1, total_records)
-
-	pages_dictionary = {
-		"current_page": current_page,
-		"total_pages": total_pages,
-		"start_record": start_record,
-		"end_record": end_record,
-		"total_records": total_records,
-		"page_size": page_size,
-	}
-	print(pages_dictionary)
-	return render_template("public/lists.html", urls=urls, short=short, pages=pages_dictionary)
-
 #
 # ---------------------------------------------------------------------------------------------------------------------
 # Route: /dashboard - display the overview of short urls - Statistics and Charts
@@ -744,6 +464,277 @@ def dashboard_index():
 	return render_template("/public/dashboard.html", plot=plots, special_plot=special_plots, figure=figures, divs=div_list)
 #
 # ---------------------------------------------------------------------------------------------------------------------
+# Route: /lists - render "lists.html" with "urls", "short"
+@app.route("/lists")
+def lists():
+	short = secrets.token_hex(3)
+	urls  = URL.all_url_pages(1, page_size)
+	total_records = len(URL.all_url())
+	current_page = 1
+
+	total_pages = math.ceil(total_records / page_size)
+	start_record = (current_page - 1) * page_size + 1
+	end_record = min(start_record + page_size - 1, total_records)
+
+	pages_dictionary = {
+		"current_page": current_page,
+		"total_pages": total_pages,
+		"start_record": start_record,
+		"end_record": end_record,
+		"total_records": total_records,
+		"page_size": page_size,
+	}
+	print(pages_dictionary)
+
+	return render_template("public/lists.html", urls=urls, short=short, pages=pages_dictionary)
+#
+# ---------------------------------------------------------------------------------------------------------------------
+# Route: /lists/<int:current_page> - render "lists.html" with "urls", "short"
+@app.route("/lists/<int:current_page>")
+def lists_page(current_page=None):
+	short = secrets.token_hex(3)
+	urls  = URL.all_url_pages(current_page, page_size)
+	total_records = len(URL.all_url())
+	total_pages = math.ceil(total_records / page_size)
+	start_record = (current_page - 1) * page_size + 1
+	end_record = min(start_record + page_size - 1, total_records)
+
+	pages_dictionary = {
+		"current_page": current_page,
+		"total_pages": total_pages,
+		"start_record": start_record,
+		"end_record": end_record,
+		"total_records": total_records,
+		"page_size": page_size,
+	}
+	print(pages_dictionary)
+	return render_template("public/lists.html", urls=urls, short=short, pages=pages_dictionary)
+
+#
+# ---------------------------------------------------------------------------------------------------------------------
+# Route: /search - render "search.html"
+@app.route("/search", methods=["GET", "POST"])
+def search():
+	ip_address, visitors = "", None
+	if request.method == "GET":
+		return render_template("/public/search.html", ip_address=ip_address, visitors=visitors)
+	else:
+		ip_address = request.form["ip_address"]
+		if ip_address:
+			session["ip_address"] = ip_address
+			visitors = Visitor.get_url_visitor_by_ip(ip_address, 1, page_size)
+		return render_template("/public/search.html", ip_address=ip_address, visitors=visitors, per_page=page_size)
+	#
+# ---------------------------------------------------------------------------------------------------------------------
+# Route: /search - render "search.html"
+@app.route("/search/<int:current_page>", methods=["GET"])
+def search_page(current_page=1):	
+	if "ip_address" in session:
+		ip_address = session["ip_address"]		
+		visitors = Visitor.get_url_visitor_by_ip(ip_address, current_page, page_size)
+		return render_template("/public/search.html", ip_address=ip_address, visitors=visitors, per_page=page_size)
+	else:
+		return redirect(url_for("search"))
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Route: /statistics - Render "statistics.html" with the DataFrame group by "url_short_url", "url_title", "url_description"
+#
+@app.route("/statistics")
+def statistics():	
+	df, total = Visitor.visitors_df()
+	groupby_cols = ['url_short_url', 'url_title', 'url_description']
+	count_col = "visitor_ip"
+	df_count_list = create_df_count_list(df, groupby_cols, count_col)
+	total_records = len(df_count_list)
+	current_page = 1	
+	total_pages = math.ceil(len(df_count_list) / page_size)
+	start_record = (current_page - 1) * page_size + 1
+	end_record = min(start_record + page_size - 1, total_records)
+	
+	df_data = df_count_list[:end_record]
+	pages_dictionary = {
+		"current_page": current_page,
+		"total_pages": total_pages,
+		"start_record": start_record,
+		"end_record": end_record,
+		"total_records": total_records,
+		"page_size": page_size,
+	}
+	return render_template("public/statistics.html", df_data=df_data, pages=pages_dictionary)
+#
+# ---------------------------------------------------------------------------------------------------------------------
+# Route: /statistics/<int:current_page> - Render "statistics.html" with the DataFrame group by "url_short_url", 
+# "url_title", "url_description", with pagination
+#
+@app.route("/statistics/<int:current_page>")
+def statistics_page(current_page=1):
+	
+	df, total = Visitor.visitors_df()
+	groupby_cols = ['url_short_url', 'url_title', 'url_description']
+	count_col = "visitor_ip"
+	df_count_list = create_df_count_list(df, groupby_cols, count_col)
+	total_records = len(df_count_list)
+	
+	total_pages = math.ceil(len(df_count_list) / page_size)
+	start_record = (current_page - 1) * page_size + 1
+	end_record = min(start_record + page_size - 1, total_records)	
+	df_data = df_count_list[start_record-1:end_record]
+
+	pages_dictionary = {
+		"current_page": current_page,
+		"total_pages": total_pages,
+		"start_record": start_record,
+		"end_record": end_record,
+		"total_records": total_records,
+		"page_size": page_size,
+	}
+
+	return render_template("public/statistics.html", df_data=df_data, pages=pages_dictionary)
+#
+# ---------------------------------------------------------------------------------------------------------------------
+# Route: /info/<string:short_url> - Render "detail.html" with "url_info, "referrer", "visitor_data", "plots"
+@app.route("/info/<string:short_url>")
+def detail(short_url):
+	df, total = Visitor.visitors_df()
+	# df = pd.read_csv("url_visitor.csv", index_col=0)
+	# Select the Dataframe with "url_short_url"
+	df_short_url = df[df["url_short_url"] == short_url]	
+	# Select the sub-DataFrame with the columns url_short_url', 'url_long_url', 'url_title', 'url_description', 
+	# 'url_created_date', 'visitor_ip', 'visitor_visited_date', 'visitor_city', 'visitor_country', 'visitor_machine', 
+	# 'visitor_os', 'visitor_browser'
+	
+	new_df = df_short_url.loc[:, ['url_short_url', 'url_long_url', 'url_title', 'url_description', 'url_created_date', 'visitor_ip', 'visitor_visited_date', 'visitor_city', 'visitor_country', 'visitor_machine', 'visitor_os', 'visitor_browser']]
+	new_df.loc[:, 'url_created_date'] = pd.to_datetime(new_df['url_created_date'])
+	new_df.loc[:, 'visitor_visited_date'] = pd.to_datetime(new_df['visitor_visited_date'])
+
+	# Plot -  Number of first/return visitors
+	visitor_ip_all = new_df.groupby(["visitor_ip"])
+	visitor_ip_once = visitor_ip_all.filter(lambda x: len(x) == 1)
+	visitor_ip_return = len(visitor_ip_all) - len(visitor_ip_once)
+	visitor_new_return = [len(visitor_ip_once), visitor_ip_return]
+	# Form the DataFrame for number of first/return visitors
+	df_visitor_new_return = pd.DataFrame({
+		"visitor_type": ["New", "Return"],
+		"count": visitor_new_return,
+	})
+	visitor_new_return_title = "Visitors by User Type"
+	visitor_new_return_x = "visitor_type"
+	visitor_new_return_y = "count"
+	visitor_new_return_width = 220
+	visitor_new_return_height = 200
+	visitor_new_return_plot = create_special_bar(df_visitor_new_return, visitor_new_return_title, visitor_new_return_x, visitor_new_return_y, visitor_new_return_width, visitor_new_return_height)
+	
+	# Plot - Countries that Visitors are from	
+	country_groupby = new_df.groupby("visitor_country")
+	df_country = country_groupby["visitor_ip"].nunique()
+	visitor_countries = df_country.sort_values(ascending=False).head()
+	country_data = visitor_countries
+	country_title = "Top 5 Countries that Visitors are from"
+	country_values = "visitor_ip"
+	country_width = 400
+	country_plot = create_small_pie(country_data, country_title, country_values, country_width)
+
+	# Plot - Visits by Weeks of Year
+	df['week'] = pd.to_datetime(new_df['visitor_visited_date']).dt.to_period("W").astype(str)
+	df_week = df.groupby(["week"])
+	week_count_data = df_week.size().reset_index(name="count_per_week")
+	week_count_width = 400
+	week_count_x = "week"
+	week_count_y = "count_per_week"
+	week_count_title = "Visits by Weeks of Year"
+	week_count_plot = create_small_line(week_count_data, week_count_title, week_count_width, week_count_x, week_count_y, True)
+
+	# Plot - Machine used by the visitors
+	machine_width = 300 
+	machine_title = "Machine"
+	machine_orientation = "v"
+	machine_group = new_df.groupby(["visitor_machine"])
+	machine_data = machine_group.count()["visitor_ip"].sort_values(ascending=False)		
+	machine_plot = create_small_bar(machine_data, machine_title, machine_width, fig_orientation=machine_orientation)
+
+	# Plot - OS used by the visitors
+	df["os_category"] = new_df["visitor_os"].apply(lambda x: categorise_os(x))
+	os_group = df.groupby(["os_category"])
+	os_data = os_group["visitor_os"].count().sort_values(ascending=False).head()
+	os_title = "OS"
+	os_width = 300
+	os_orientation = "v"
+	os_plot = create_small_bar(os_data, os_title, os_width, fig_orientation=os_orientation)
+
+	# Plot - Browser used by the visitors
+	df["browser_category"] = new_df["visitor_browser"].apply(lambda x: categorise_browser(x))
+	browser_group = df.groupby(["browser_category"])	
+	browser_data = browser_group["visitor_browser"].count().sort_values(ascending=False).head()
+	browser_title = "Browser"
+	browser_width = 300
+	browser_orientation = "v"
+	browser_plot = create_small_bar(browser_data, browser_title, browser_width, fig_orientation=browser_orientation)
+
+	# Set "url_info" dictionary to store the figures: "short_url", "long_url", "title", "description", "created_date", "number_of_visitors"
+	url_info = {
+		"short_url": new_df['url_short_url'].values[0],
+		"long_url": new_df['url_long_url'].values[0],
+		"title": new_df['url_title'].values[0],
+		"description":  new_df['url_description'].values[0],
+		"created_date": new_df['url_created_date'].values[0],
+		"number_of_visitors": len(new_df), 
+	}
+
+	# Set "plots" dictionary to store the plots: "visitor_new_return_plot", "country_plot", "week_count_plot", "machine_plot", 
+	# "os_plot", "browser_plot"
+	plots = {
+		"visitor_new_return_plot": visitor_new_return_plot,
+		"country_plot": country_plot,
+		"week_count_plot": week_count_plot,
+		"machine_plot": machine_plot,
+		"os_plot": os_plot,
+		"browser_plot": browser_plot,
+	}
+
+	# Set the referrer to store the referrer link for backward
+	referrer = request.referrer if request.referrer else request.url
+	return render_template("public/detail.html", referrer=referrer, url_info=url_info, plots=plots)
+#
+# ---------------------------------------------------------------------------------------------------------------------
+# Route: /redirect - render "redirect.html" with "url_short_url"
+@app.route("/redirect/<string:short_url>")
+def redirect_short(short_url):
+	headers = {'Accept': 'application/json'	}
+	base_url = "http://ip-api.com/json"
+	query = f"fields=status,message,country,regionName,city,lat,lon,isp,asname,query"
+	ip_dictionary, user_agent_dictionary, visitor_dictionary = {}, {}, {}
+	count = 0
+	# ip_address = request.remote_addr
+	# Check the validity of ip address
+	response = requests.get(base_url, headers=headers)
+	ip_data = response.json()
+
+	if ip_data["status"] == "success":
+		ip_dictionary = get_ip_dictionary(ip_data)
+		user_agent_string = request.user_agent.string
+		user_agent_dictionary = get_user_agent_dictionary(user_agent_string)
+	else:
+		ip_list = load_ip_file()
+		ip_index = random.randrange(len(ip_list))
+		fake_ip = ip_list[ip_index]
+		query_url = f"{base_url}/{fake_ip}?{query}"
+		response = requests.get(query_url, headers=headers)
+		ip_data = response.json()
+		ip_dictionary = get_ip_dictionary(ip_data)
+		user_agent_list = load_user_agent_file()	
+		user_agent_index = random.randrange(len(user_agent_list))
+		user_agent_string = user_agent_list[user_agent_index]
+		user_agent_dictionary = get_user_agent_dictionary(user_agent_string)
+		user_agent_dictionary["bot"] = True
+
+	visitor_dictionary = {**ip_dictionary, **user_agent_dictionary}
+	url = URL.find_by_short_url(short_url)
+	if url:
+		visitor_dictionary["url_id"] = url.url_id
+		count = Visitor.add_visitor(**visitor_dictionary)
+	return render_template("/public/redirect.html", url=url, visitor=visitor_dictionary)
+#
+# ---------------------------------------------------------------------------------------------------------------------
 # Route: /shorten - render "index.html" with "urls", "short"
 @app.route("/shorten", methods=["POST"])
 def shorten():
@@ -798,6 +789,12 @@ def shorten():
 			return redirect(url_for('lists'))
 	else:
 		return redirect(url_for('lists'))
+#
+# ---------------------------------------------------------------------------------------------------------------------
+# Route: /contact - Render "contact.html"
+@app.route("/contact")
+def contact():
+	return render_template("/public/contact.html")
 #
 # *********************************************************************************************************************
 # Filter: datetime - convert the datetime to string format "%Y-%m-%d %H:%M:%S"
