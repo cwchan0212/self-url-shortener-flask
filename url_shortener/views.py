@@ -8,11 +8,15 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, make_response, jsonify, flash, session, url_for
 from user_agents import parse
 from .models import URL, Visitor, page_size
+from flask_caching import Cache
 
 # *********************************************************************************************************************
 # Environment variables
 # Set page_size to 20
 page_size = 20
+
+cache = Cache(config={"CACHE_TYPE": "simple"})
+@cache.cached(timeout=300)
 #
 # *********************************************************************************************************************
 # ******* Self defined functions **********

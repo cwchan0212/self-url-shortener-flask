@@ -16,7 +16,6 @@ These instructions will get you a copy of the project up and running on your loc
 - **Python** 3.10 or later
 - **Flask** 2.2.0 or later
 - Additional packages: 
-   - beautifulsoup4
    - Flask-SQLAlchemy
    - numpy
    - pandas
@@ -60,7 +59,6 @@ pip install Flask
 
 6. Install the necessary packages:
 ```
-pip install beautifulsoup4
 pip install Flask-SQLAlchemy
 pip install numpy
 pip install pandas
@@ -262,6 +260,23 @@ To contact the developer for feedback or support via Email, LinkedIn or GitHub.
 
 <p align="center"><img src="assets/images/09.png" width="600"><br>
 <i>9. Contact - Let's connect!</i></p>
+
+### Known Issue
+The speed of loading the Dashboard and Statistics pages is relatively slow due to loading the data frame from query record sets and plotting the graphs.
+
+#### Solution
+To address the slow loading speed, the Flask Cache is adopted to cache the data frame and graph for a certain amount of time. The flask_caching module is used to implement caching as follows:
+
+```python
+from flask_caching import Cache
+
+cache = Cache(config={"CACHE_TYPE": "simple"})
+@cache.cached(timeout=300)
+```
+
+This solution may not be perfect, but it's an attempt to improve the loading speed.
+
+If you have any possible solution or suggestion to improve the loading speed of the Dashboard and Statistics, please feel free to contact me or create a pull request on the GitHub repository. Your contributions are highly appreciated.
 
 ### Acknowledgements
 This project was made possible with the help of the following resources:
