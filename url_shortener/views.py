@@ -331,7 +331,6 @@ def index():
 def dashboard_index():
 	df, total = Visitor.visitors_df()
 	# df = pd.read_csv("url_visitor.csv")
-
 	machine_width, os_width, browser_width = 0, 0, 0
 	row_width_first, row_width_second, row_width_third = 400, 400, 250
 	row_orientation_third = "v"
@@ -339,7 +338,6 @@ def dashboard_index():
 	week_count_plot, bounce_count_plot, short_url_plot = None, None, None
 	machine_plot, os_plot, browser_plot = None, None, None
 	country_fig, machine_fig, os_fig, browser_fig = None, None, None, None
-
 	# Figures
 	# 1. No of visitors (group visitors visit on the same date), 
 	# #regardless their countries,
@@ -517,8 +515,7 @@ def list():
 		"end_record": end_record,
 		"total_records": total_records,
 		"page_size": page_size,
-	}
-	print(pages_dictionary)
+	}	
 
 	return render_template("public/list.html", urls=urls, short=short, pages=pages_dictionary)
 #
@@ -541,7 +538,6 @@ def list_page(current_page=None):
 		"total_records": total_records,
 		"page_size": page_size,
 	}
-	print(pages_dictionary)
 	return render_template("public/list.html", urls=urls, short=short, pages=pages_dictionary)
 
 #
@@ -593,7 +589,6 @@ def statistics():
 		"total_records": total_records,
 		"page_size": page_size,
 	}
-	print(pages_dictionary)
 	return render_template("public/statistics.html", df_data=df_data, pages=pages_dictionary)
 #
 # ---------------------------------------------------------------------------------------------------------------------
@@ -629,13 +624,10 @@ def statistics_page(current_page=1):
 # Route: /info/<string:short_url> - Render "detail.html" with "url_info, "referrer", "visitor_data", "plots"
 @app.route("/info/<string:short_url>")
 def detail(short_url):
-
-
 	df, total = Visitor.visitors_df()
 	groupby_cols = ['url_id', 'url_short_url', 'url_long_url', 'url_title', 'url_description', 'url_created_date']
 	count_col = "visitor_ip"
 	df_count_list = create_df_count_list(df, groupby_cols, count_col)
-
 	short_dict = [ data for data in df_count_list if data["url_short_url"] == short_url][0]
 
 	# Set "url_info" dictionary to store the figures: "short_url", "long_url", "title", "description", "created_date", "number_of_visitors"
@@ -650,7 +642,7 @@ def detail(short_url):
 
 	visit_count = short_dict["count"]	
 
-	df, total = Visitor.visitors_df()
+	# df, total = Visitor.visitors_df()
 	# Select the Dataframe with "url_short_url"
 	df_short_url = df[df["url_short_url"] == short_url]	
 	# Select the sub-DataFrame with the columns url_short_url', 'url_long_url', 'url_title', 'url_description', 

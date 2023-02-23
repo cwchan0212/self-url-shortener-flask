@@ -1,6 +1,15 @@
 import urllib.parse as up
-
+import os
 from flask import Flask
+
+
+def fullpath_database_uri(db_uri):
+    basedir = str(os.getcwd()).replace("\\", "/")
+    db_uri = app.config['SQLALCHEMY_DATABASE_URI']
+    db_name = db_uri.replace("sqlite:///", "")
+    db_filepath = f"sqlite:///{basedir}/instance/{db_name}"
+    return db_filepath
+
 
 app = Flask(__name__ )
 app.config.from_prefixed_env()
@@ -24,10 +33,14 @@ if remote:
         SQLALCHEMY_DATABASE_URI=database_uri,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
+
+    
 # ---------------------------------------------------------------------------------------------------------------------
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = fullpath_database_uri(app.config['SQLALCHEMY_DATABASE_URI'])
 
 print(f" # It is a {app.config['ENV']} mode.")
-# print(f" # {app.config['SQLALCHEMY_DATABASE_URI']} ")
+print(f" # {app.config['SQLALCHEMY_DATABASE_URI']} ")
 # print(f" # {app.config['DB_URL']} ")
 
 # =====================================================================================================================

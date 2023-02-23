@@ -4,7 +4,7 @@ from url_shortener import app
 from .models import db
 
 app.config.from_prefixed_env()
-print(f" # {app.config['SQLALCHEMY_DATABASE_URI']}")
+print(f" # {app.config['SQLALCHEMY_DATABASE_URI']} #2")
 
 try:
     with app.app_context():

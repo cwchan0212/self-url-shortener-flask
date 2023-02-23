@@ -4,7 +4,7 @@
 ### Introduction 
 This application was built using the **Flask framework** with **PostgreSQL** to a URL shortener.  It generates shortened URLs for users and records the visitor's IP address and user agent. The analytics dashboard features comprehensive metrics and statistics, such as weekly visits, bounce rate, and visitor origin. Users can search for visitors by IP address or user agent and gain detailed insights into their audience. 
 
-<p align="center"><img src="capstone_project/assets/images/01.png" width="600"><br>
+<p align="center"><img src="assets/images/01.png" width="600"><br>
 <i>1. The overview of URL Shortener</i></p>
 
 ### Getting Started

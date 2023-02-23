@@ -1,10 +1,12 @@
 import pandas as pd
 from sqlalchemy import Column, String, DateTime, Boolean, Text, JSON, asc, desc, exists, text, inspect, func, create_engine
 from flask_sqlalchemy import SQLAlchemy
-from url_shortener import app
+from url_shortener import app, fullpath_database_uri
 from random import shuffle
 
 db = SQLAlchemy(app)
+# app.config['SQLALCHEMY_DATABASE_URI'] = fullpath_database_uri(app.config['SQLALCHEMY_DATABASE_URI'])
+print("engine", app.config['SQLALCHEMY_DATABASE_URI'])
 engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
 page_size = 20
@@ -123,6 +125,8 @@ class Visitor(db.Model):
 	visitor_user_agent = db.Column(Text, nullable=False)
 	visitor_visited_date = db.Column(db.DateTime, server_default=text("CURRENT_TIMESTAMP"))
 
+# ---------------------------------------------------------------------------------------------------------------------
+	# Create a method "add_visitor" to add a new visitor
 	def add_visitor(url_id, ip, city, region, country, coords, isp, bot, os, device, browser, machine, user_agent, visited_date=None):
 		count = 0
 		try:
@@ -143,14 +147,48 @@ class Visitor(db.Model):
 	def visitors_df(current_page=1):
 		df_visitors = None
 		total_count = 0
+		data = []
 		try:	
 			# query = db.session.query(URL, Visitor).join(URL, Visitor.url_id == URL.url_id).order_by(Visitor.visitor_visited_date.desc())
-			query = db.session.query(URL, Visitor).outerjoin(Visitor, Visitor.url_id == URL.url_id).order_by(Visitor.visitor_visited_date.desc())
+			# query = db.session.query(URL, Visitor).outerjoin(Visitor, Visitor.url_id == URL.url_id).order_by(Visitor.visitor_visited_date.desc())
 			# query = db.session.query(URL, func.count(Visitor.visitor_id)).outerjoin(Visitor, Visitor.url_id == URL.url_id).group_by(URL.url_id).order_by(func.count(Visitor.visitor_id).desc())
+			# visitors = query.paginate(page=current_page, per_page=page_size)			
+			# df_visitors = pd.read_sql(visitors.statement, engine.connect())
+			# total_count = len(visitors) #visitors.total
 
-			visitors = query.paginate(page=current_page, per_page=page_size)			
-			df_visitors = pd.read_sql(query.statement, engine.connect())
-			total_count = visitors.total
+			query = db.session.query(URL, Visitor).join(Visitor, Visitor.url_id == URL.url_id, isouter=True).order_by(Visitor.visitor_visited_date.desc())
+			results = query.all()			
+			url_visitor_dictionary = {}
+			for url, visitor in results:
+				url_dictionary = {
+					"url_id": url.url_id,
+					'url_short_url': url.url_short_url,
+					'url_long_url': url.url_long_url,
+					'url_title': url.url_title,
+					'url_description': url.url_description,
+					'url_created_date': url.url_created_date,
+					'url_updated_date': url.url_updated_date,
+				}
+				visitor_dictionary = {
+					'visitor_id': visitor.visitor_id if visitor is not None else None,
+					'visitor_ip': visitor.visitor_ip if visitor is not None else None,
+					'visitor_city': visitor.visitor_city if visitor is not None else None,
+					'visitor_region': visitor.visitor_region if visitor is not None else None,
+					'visitor_country': visitor.visitor_country if visitor is not None else None,
+					'visitor_coords': visitor.visitor_coords if visitor is not None else None,
+					'visitor_isp': visitor.visitor_isp if visitor is not None else None,
+					'visitor_bot': visitor.visitor_bot if visitor is not None else None,
+					'visitor_os': visitor.visitor_os if visitor is not None else None,
+					'visitor_device': visitor.visitor_device if visitor is not None else None,
+					'visitor_browser': visitor.visitor_browser if visitor is not None else None,
+					'visitor_machine': visitor.visitor_machine if visitor is not None else None,
+					'visitor_user_agent': visitor.visitor_user_agent if visitor is not None else None,
+					'visitor_visited_date': visitor.visitor_visited_date if visitor is not None else None
+				}
+				url_visitor_dictionary = {**url_dictionary, **visitor_dictionary}
+				data.append(url_visitor_dictionary)
+			df_visitors = pd.DataFrame(data)
+			total_count = df_visitors.shape[0]
 		except Exception as e:
 			print(e)
 		return [df_visitors, total_count]
@@ -158,19 +196,22 @@ class Visitor(db.Model):
 # ---------------------------------------------------------------------------------------------------------------------
 	# Create a method "get_visitor_count_by_country_and_url" to get the count of visitors by country and url
 	def get_visitor_count_by_country_and_url(short_url, sorting=False):
-		if sorting:
-			visitor = db.session.query(
-				Visitor.visitor_country, 
-				db.func.count(db.func.distinct(Visitor.visitor_ip)).label("distinct_visitor_ips"),
-				db.func.count(db.func.distinct(Visitor.url_id)).label("distinct_urls")
-			).join(URL, URL.url_id == Visitor.url_id).filter(URL.url_short_url == short_url).order_by(db.func.count(db.func.distinct(Visitor.visitor_ip)).desc()).group_by(Visitor.visitor_country, URL.url_long_url).all()
-		else:
-			visitor = db.session.query(
-				Visitor.visitor_country, 
-				db.func.count(db.func.distinct(Visitor.visitor_ip)).label("distinct_visitor_ips"),
-				db.func.count(db.func.distinct(Visitor.url_id)).label("distinct_urls")
-			).join(URL, URL.url_id == Visitor.url_id).filter(URL.url_short_url == short_url).group_by(Visitor.visitor_country, URL.url_long_url).all()
-
+		visitors = None
+		try:
+			if sorting:
+				visitor = db.session.query(
+					Visitor.visitor_country, 
+					db.func.count(db.func.distinct(Visitor.visitor_ip)).label("distinct_visitor_ips"),
+					db.func.count(db.func.distinct(Visitor.url_id)).label("distinct_urls")
+				).join(URL, URL.url_id == Visitor.url_id).filter(URL.url_short_url == short_url).order_by(db.func.count(db.func.distinct(Visitor.visitor_ip)).desc()).group_by(Visitor.visitor_country, URL.url_long_url).all()
+			else:
+				visitor = db.session.query(
+					Visitor.visitor_country, 
+					db.func.count(db.func.distinct(Visitor.visitor_ip)).label("distinct_visitor_ips"),
+					db.func.count(db.func.distinct(Visitor.url_id)).label("distinct_urls")
+				).join(URL, URL.url_id == Visitor.url_id).filter(URL.url_short_url == short_url).group_by(Visitor.visitor_country, URL.url_long_url).all()
+		except Exception as e:
+			print(e)
 		return visitor
 #
 # ---------------------------------------------------------------------------------------------------------------------
@@ -178,8 +219,7 @@ class Visitor(db.Model):
 	def get_url_visitor_df():
 		df = None
 		try:
-			query = db.session.query(URL, Visitor)\
-							.join(URL, Visitor.url_id == URL.url_id)
+			query = db.session.query(URL, Visitor).join(URL, Visitor.url_id == URL.url_id)
 			df = pd.read_sql(query.statement, engine.connect())
 		except Exception as e:
 			print(e)
