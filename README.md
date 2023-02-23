@@ -264,7 +264,7 @@ To contact the developer for feedback or support via Email, LinkedIn or GitHub.
 ### Known Issue
 The speed of loading the Dashboard and Statistics pages is relatively slow due to loading the data frame from query record sets and plotting the graphs.
 
-#### Solution
+### Solution
 To address the slow loading speed, the Flask Cache is adopted to cache the data frame and graph for a certain amount of time. The flask_caching module is used to implement caching as follows:
 
 ```python
