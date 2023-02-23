@@ -40,7 +40,7 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = fullpath_database_uri(app.config['SQLALCHEMY_DATABASE_URI'])
 
 print(f" # It is a {app.config['ENV']} mode.")
-print(f" # {app.config['SQLALCHEMY_DATABASE_URI']} ")
+# print(f" # {app.config['SQLALCHEMY_DATABASE_URI']} ")
 # print(f" # {app.config['DB_URL']} ")
 
 # =====================================================================================================================

@@ -5,8 +5,8 @@ from url_shortener import app, fullpath_database_uri
 from random import shuffle
 
 db = SQLAlchemy(app)
-# app.config['SQLALCHEMY_DATABASE_URI'] = fullpath_database_uri(app.config['SQLALCHEMY_DATABASE_URI'])
-print("engine", app.config['SQLALCHEMY_DATABASE_URI'])
+app.config['SQLALCHEMY_DATABASE_URI'] = fullpath_database_uri(app.config['SQLALCHEMY_DATABASE_URI'])
+#print("engine", app.config['SQLALCHEMY_DATABASE_URI'])
 engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
 page_size = 20
