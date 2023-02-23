@@ -33,7 +33,6 @@ if remote:
         SQLALCHEMY_DATABASE_URI=database_uri,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
-
     
 # ---------------------------------------------------------------------------------------------------------------------
 else:

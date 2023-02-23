@@ -7,7 +7,7 @@ from random import shuffle
 db = SQLAlchemy(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = fullpath_database_uri(app.config['SQLALCHEMY_DATABASE_URI'])
 #print("engine", app.config['SQLALCHEMY_DATABASE_URI'])
-engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+# engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
 page_size = 20
 
@@ -216,14 +216,14 @@ class Visitor(db.Model):
 #
 # ---------------------------------------------------------------------------------------------------------------------
 	# Create a method "get_url_visitor_df" to get the DataFrame of URL and Visitor 
-	def get_url_visitor_df():
-		df = None
-		try:
-			query = db.session.query(URL, Visitor).join(URL, Visitor.url_id == URL.url_id)
-			df = pd.read_sql(query.statement, engine.connect())
-		except Exception as e:
-			print(e)
-		return df
+	# def get_url_visitor_df():
+	# 	df = None
+	# 	try:
+	# 		query = db.session.query(URL, Visitor).join(URL, Visitor.url_id == URL.url_id)
+	# 		df = pd.read_sql(query.statement, engine.connect())
+	# 	except Exception as e:
+	# 		print(e)
+	# 	return df
 #
 # ---------------------------------------------------------------------------------------------------------------------
 	# Create a function "get_url_visitor_by_ip" with the parameter "ip_address" to get the visitors' history
