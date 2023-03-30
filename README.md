@@ -1,6 +1,9 @@
 ## Side Project - URL Shortener (Flask) 
 <a href="https://6gg9.short.gy/zgZzsZ" target="_blank">:arrow_right: Preview</a>  
 
+[url-shortener-flask.mp4](https://user-images.githubusercontent.com/7412075/228988953-870cb9c2-0035-4534-98c7-e1aeb89d65ff.mp4
+)
+
 ### Introduction 
 This application was built using the **Flask framework** with **PostgreSQL** to a URL shortener.  It generates shortened URLs for users and records the visitor's IP address and user agent. The analytics dashboard features comprehensive metrics and statistics, such as weekly visits, bounce rate, and visitor origin. Users can search for visitors by IP address or user agent and gain detailed insights into their audience. 
 
